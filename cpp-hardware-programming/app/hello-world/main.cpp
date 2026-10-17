@@ -2,6 +2,6 @@
 
 int main()
 {
-    std::cout << "Hello, World!\n";
+    std::cout << "Hello, Raspberry Pi!\n";
     return 0;
 }

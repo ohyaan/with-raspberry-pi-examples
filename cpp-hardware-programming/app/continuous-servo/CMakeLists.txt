@@ -1,0 +1,1 @@
+course_example(rotation_plan)

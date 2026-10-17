@@ -1,1 +1,7 @@
 add_subdirectory(hello-world)
+add_subdirectory(gpio-led)
+add_subdirectory(gpio-button)
+add_subdirectory(pwm)
+add_subdirectory(positional-servo)
+add_subdirectory(continuous-servo)
+add_subdirectory(ssd1306)

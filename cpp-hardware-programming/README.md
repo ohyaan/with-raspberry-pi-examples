@@ -2,10 +2,25 @@
 
 Examples for the [C++ Hardware Programming course](https://ohyaan.github.io/programming/).
 
+## Samples by lesson
+
+| Lesson | Sample | Executable | Default behaviour |
+|---|---|---|---|
+| 1. Development Setup | [hello-world](app/hello-world/README.md) | `hello_world` | Print Hello, Raspberry Pi! |
+| 2. LED Output | [gpio-led](app/gpio-led/README.md) | `gpio_led` | Describe finite blinks without opening a GPIO chip |
+| 3. Button Input | [gpio-button](app/gpio-button/README.md) | `gpio_button` | Describe active-low input without opening a GPIO chip |
+| 4. Buzzer and Hardware PWM | [pwm](app/pwm/README.md) | `pwm_pulse` | Plan finite pulses without opening PWM files |
+| 5. Positional Servo | [positional-servo](app/positional-servo/README.md) | `servo_plan` | Calculate pulse units; actual output reuses `pwm_pulse` |
+| 6. Continuous Servo | [continuous-servo](app/continuous-servo/README.md) | `rotation_plan` | Calculate neutral/offset commands; output reuses `pwm_pulse` |
+| 7. SSD1306 OLED | [ssd1306](app/ssd1306/README.md) | `oled_hello` | Construct HELLO PI without opening I2C |
+
+All seven samples are built by default. Samples are named by topic, while this table and their READMEs retain the site's chapter order. The PWM implementation is shared by lessons 4–6 rather than copied into three drivers.
+
 ## Requirements
 
 - Linux on the development machine or Raspberry Pi.
 - CMake 3.28 or newer, Make and a C++17 compiler (GCC or Clang).
+- Linux development headers with GPIO character-device v2 (`linux/gpio.h`) and I2C (`linux/i2c-dev.h`) interfaces.
 - No display, GPIO wiring, root access or downloaded libraries for Hello World.
 
 Check the installed tools before building:
@@ -33,10 +48,23 @@ ctest --preset native-debug
 Expected program output:
 
 ```text
-Hello, World!
+Hello, Raspberry Pi!
 ```
 
-CTest checks the exit status, complete standard output and empty standard error. The test does not access hardware.
+CTest runs 33 software-only checks: the complete greeting and exit status, dry runs, unit calculations, input boundaries and error messages. No CTest case enables GPIO, PWM or OLED output. The GPIO/PWM/OLED paths used in tests are placeholders, not device-selection advice.
+
+Safe first runs from this directory:
+
+```bash
+./build/native/debug/gpio_led /dev/gpiochip-unverified
+./build/native/debug/gpio_button /dev/gpiochip-unverified
+./build/native/debug/pwm_pulse /sys/class/pwm/pwmchip-unverified 0 2272727 1136363 500
+./build/native/debug/servo_plan 1500
+./build/native/debug/rotation_plan 1500 0
+./build/native/debug/oled_hello /dev/i2c-1 0x3c
+```
+
+These commands perform no device I/O. Do not append hardware-output flags without following the corresponding article's power, circuit, controller and permissions checks. GPIO/PWM use `--apply`; OLED uses `--show` or `--off`. Build and test never need sudo. Shut down and disconnect all relevant supplies before rewiring; GPIO is not a motor power source.
 
 For an optimized build:
 
@@ -66,15 +94,22 @@ cpp-hardware-programming/
 ├── CMakePresets.json
 ├── app/
 │   ├── CMakeLists.txt
-│   └── hello-world/
-│       ├── CMakeLists.txt
-│       ├── main.cpp
-│       └── tests/check_output.cmake
+│   ├── hello-world/
+│   ├── gpio-led/
+│   ├── gpio-button/
+│   ├── pwm/
+│   ├── positional-servo/
+│   ├── continuous-servo/
+│   └── ssd1306/
+├── tests/
+│   ├── CMakeLists.txt
+│   └── check_program.cmake
 └── tools/cmake/
+    ├── course_examples.cmake
     └── linux-x64_toolchain.cmake
 ```
 
-Like the template, the category owns its CMake project, puts executables in the build directory, separates Debug/Release presets and keeps compiler-specific configuration under `tools/cmake`. Additional runnable examples will be separate targets under `app/`.
+Like the template, the category owns its CMake project, puts executables in the build directory, separates Debug/Release presets and keeps compiler-specific configuration under `tools/cmake`. Every sample has its own `main.cpp`, `CMakeLists.txt` and README. Shared target settings are in `course_examples.cmake`; the greeting also has an exact-output test under its own directory.
 
 Deliberate adaptations:
 
@@ -82,16 +117,20 @@ Deliberate adaptations:
 - The optional `linux-x64-debug` / `linux-x64-release` presets select Clang 19 on an x86-64 host. They require `clang++-19` and a working standard C++ library. They do not force libc++ or lld.
 - Preset schema version 6 is compatible with the stated CMake 3.28 minimum; the template uses schema version 8.
 - C++17 and warnings are target-local. No global architecture or standard-library flags are imposed on future dependencies.
-- Hello World uses CTest without GoogleTest. Docker, dependency fetching, cross-compilation and memory-check presets are not included in this initial scaffold.
+- Tests use CTest without GoogleTest. Docker, dependency fetching, cross-compilation and memory-check presets are not included.
 
 Keep local overrides in an ignored `CMakeUserPresets.json`. Use a different build directory when changing compilers.
 
 ## Scope
 
-This first example prints to the terminal. It does not yet implement the OLED example or change the separate SSD1306 library. Hardware samples will require explicit wiring, output enablement and hardware-test instructions.
+Sources match the seven published article programs as recorded at site-source commit `6607df0f6ddf8a38bba54142fc8fd7902db44a32`. Source filenames are normalized to `main.cpp`; the implementations are unchanged. Hello World now matches the article's Raspberry Pi greeting instead of the initial scaffold's generic greeting.
+
+The OLED sample is the article's current standalone implementation. It does not yet use or modify the separate SSD1306 library. Library integration and the corresponding article rewrite remain separate work. The OLED source retains its original MIT license notice.
+
+This change collects the samples without rewriting the website, changing its chapter structure or claiming new physical validation. Use the linked articles for full wiring, configuration and recovery procedures.
 
 ## Verification
 
-On 17 October 2026, the native Debug and Release presets, the ordinary CMake build, and their output tests passed on Linux x86-64 with CMake 4.2.3 and GCC 15.2.0. A separate ordinary CMake build and output test passed with Clang 22.1.8. The checker also rejected a successful executable that produced no greeting.
+The initial single-program scaffold was checked on 17 October 2026 with CMake 4.2.3, GCC 15.2.0 and Clang 22.1.8. Validation of the complete seven-program collection is recorded in [VERIFICATION.md](VERIFICATION.md).
 
-The exact `main.cpp` compiled and printed the expected greeting on the Raspberry Pi 4B with GCC 14.2.0. CMake was not installed on that Pi, so Pi-side CMake configuration and CTest were not verified. The Clang 19-specific presets were not built in this environment because Clang 19 was unavailable. No hardware output, package installation or device configuration was performed.
+The Clang 19-specific presets have not been built in this environment because Clang 19 is unavailable. No hardware output, package installation or device configuration is part of automated verification.
