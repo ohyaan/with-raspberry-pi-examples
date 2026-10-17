@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.28)
+
+project(with_raspberry_pi_cpp_hardware LANGUAGES CXX)
+
+include(CTest)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+add_subdirectory(app)
