@@ -1,0 +1,7 @@
+high=[60000], original length=3
+updated first=46701
+owned sum=106703
+strict=Ok([46700, 0])
+invalid rejected=true
+valid only=[46700, 0]
+countdown=[3, 2, 1]

@@ -1,0 +1,5 @@
+Pi 4B: owned worker
+measured=3, missing=1, matching=1
+scoped sum=46200, retained=3
+readers=fixture,fixture
+setting=ready

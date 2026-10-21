@@ -1,0 +1,4 @@
+46.7 C: below threshold
+60.0 C: notice
+63.2 C: notice
+Readings at or above the exercise threshold: 2

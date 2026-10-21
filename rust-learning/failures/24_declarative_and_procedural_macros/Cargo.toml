@@ -1,0 +1,11 @@
+[package]
+name = "rust_macros"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = ["fixture-macros"]
+resolver = "3"
+
+[dependencies]
+fixture_macros = { path = "fixture-macros" }

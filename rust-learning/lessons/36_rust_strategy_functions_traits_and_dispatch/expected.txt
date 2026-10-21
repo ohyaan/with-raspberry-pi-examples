@@ -1,0 +1,7 @@
+nonnegative=2
+warm=1
+captured=2
+dynamic=1
+changed=3
+stateful=2, calls=3
+retained=3

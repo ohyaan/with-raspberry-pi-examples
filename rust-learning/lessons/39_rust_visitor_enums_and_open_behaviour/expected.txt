@@ -1,0 +1,4 @@
+sum=46200, missing=1
+labels=value=0|value=-500|missing=offline|value=46700
+zero=1
+open=custom=Pi 4B

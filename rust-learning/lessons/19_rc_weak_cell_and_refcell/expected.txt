@@ -1,0 +1,11 @@
+same allocation=true
+strong owners=2
+visits=1
+readings=[46700, 0]
+write blocked=true
+after release=[46700, 0, -500]
+remaining owners=1
+value gone=true
+parent=root
+parent gone=true
+child survives=child

@@ -1,0 +1,4 @@
+selected=Pi 4B, bytes=5
+retained=Pi 4B
+independent=Pi 4B
+static=fixture

@@ -1,0 +1,3 @@
+platform=linux
+detailed=true
+Pi 4B fixture: 46700 mC

@@ -1,0 +1,7 @@
+matching=2
+stateful=3, calls=2
+once=Pi 4B
+move read-only=(5, 5)
+pointers=6,7
+returned=7
+local bytes=5

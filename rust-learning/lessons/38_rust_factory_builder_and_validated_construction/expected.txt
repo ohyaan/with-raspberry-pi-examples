@@ -1,0 +1,6 @@
+direct=0..46700, period=1000
+built=-500..0, period=250
+missing=MissingLower
+zero period=Interval
+invalid bounds=Bounds
+last period=500

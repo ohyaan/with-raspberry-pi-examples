@@ -1,0 +1,7 @@
+generic=Some(46700)
+impl argument=Some(46700)
+dynamic=Some(46700)
+mixed=Some(46700)
+mixed=None
+opaque return=Some(0)
+boxed borrow=Some(-500)

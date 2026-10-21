@@ -1,0 +1,4 @@
+first=3, second=1
+log=A:0|B:0|C:0|C:-500
+closed=1, repeated=0
+after close=Closed

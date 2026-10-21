@@ -1,0 +1,3 @@
+normal=46700
+missing=true
+opened=2, closed=2

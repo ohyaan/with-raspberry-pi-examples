@@ -1,0 +1,2 @@
+measured=3, missing=1, invalid=2, matching=1
+error=reading outside fixture range: 125001 mC

@@ -1,0 +1,6 @@
+reading=46700 (46.7 C)
+max: 60000
+window length=3
+label: Pi 5
+still owned=Pi 4B
+empty window: empty

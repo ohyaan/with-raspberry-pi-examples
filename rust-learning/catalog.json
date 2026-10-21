@@ -1,0 +1,418 @@
+[
+  {
+    "number": 1,
+    "slug": "01_install_rust_and_first_cargo_project",
+    "title": "Install Rust on Raspberry Pi and Run Your First Cargo Project",
+    "package": "lesson_01",
+    "args": [],
+    "diagnostic": null,
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 2,
+    "slug": "02_variables_types_functions_and_control_flow",
+    "title": "Rust Variables, Types, Functions and Control Flow",
+    "package": "lesson_02",
+    "args": [],
+    "diagnostic": null,
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 3,
+    "slug": "03_types_operators_and_expressions",
+    "title": "Rust Types, Operators and Expressions",
+    "package": "lesson_03",
+    "args": [],
+    "diagnostic": "literal out of range",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 4,
+    "slug": "04_ownership_moves_copy_and_clone",
+    "title": "Rust Ownership, Moves, Copy and Clone",
+    "package": "lesson_04",
+    "args": [],
+    "diagnostic": "E0382",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 5,
+    "slug": "05_references_borrowing_and_slices",
+    "title": "Rust References, Borrowing and Slices",
+    "package": "lesson_05",
+    "args": [],
+    "diagnostic": "E0502",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 6,
+    "slug": "06_structs_methods_and_associated_functions",
+    "title": "Rust Structs, Methods and Associated Functions",
+    "package": "lesson_06",
+    "args": [],
+    "diagnostic": "E0382",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 7,
+    "slug": "07_enums_match_and_patterns",
+    "title": "Rust Enums, Match and Patterns",
+    "package": "lesson_07",
+    "args": [],
+    "diagnostic": "E0004",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 8,
+    "slug": "08_strings_vectors_and_hash_maps",
+    "title": "Rust Strings, Vectors and Hash Maps",
+    "package": "lesson_08",
+    "args": [],
+    "diagnostic": "E0502",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 9,
+    "slug": "09_option_result_and_error_handling",
+    "title": "Rust Option, Result and Error Handling",
+    "package": "lesson_09",
+    "args": [],
+    "diagnostic": "E0277",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 10,
+    "slug": "10_crates_modules_paths_and_visibility",
+    "title": "Rust Crates, Modules, Paths and Visibility",
+    "package": "pi_modules",
+    "args": [],
+    "diagnostic": "E0603",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 11,
+    "slug": "11_generics_bounds_and_const_generics",
+    "title": "Rust Generics, Bounds and Const Generics",
+    "package": "lesson_11",
+    "args": [],
+    "diagnostic": "E0369",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 12,
+    "slug": "12_traits_implementations_and_associated_types",
+    "title": "Rust Traits, Implementations and Associated Types",
+    "package": "lesson_12",
+    "args": [],
+    "diagnostic": "E0117",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 13,
+    "slug": "13_lifetimes_and_borrowed_apis",
+    "title": "Rust Lifetimes and Borrowed APIs",
+    "package": "lesson_13",
+    "args": [],
+    "diagnostic": "E0515",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 14,
+    "slug": "14_trait_objects_and_dispatch",
+    "title": "Rust Trait Objects and Dispatch: dyn Trait vs impl Trait",
+    "package": "lesson_14",
+    "args": [],
+    "diagnostic": "E0308",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 15,
+    "slug": "15_closures_and_function_pointers",
+    "title": "Rust Closures and Function Pointers",
+    "package": "lesson_15",
+    "args": [],
+    "diagnostic": "E0382",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 16,
+    "slug": "16_iterators_and_lazy_adapters",
+    "title": "Rust Iterators and Lazy Adapters",
+    "package": "lesson_16",
+    "args": [],
+    "diagnostic": "E0382",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 17,
+    "slug": "17_tests_documentation_and_cargo",
+    "title": "Rust Tests, Documentation and Cargo",
+    "package": "pi_report",
+    "args": [],
+    "diagnostic": "zero_is_not_missing",
+    "failure_kind": "test",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 18,
+    "slug": "18_box_deref_and_drop",
+    "title": "Rust Box, Deref and Drop",
+    "package": "lesson_18",
+    "args": [],
+    "diagnostic": "E0382",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 19,
+    "slug": "19_rc_weak_cell_and_refcell",
+    "title": "Rust Rc, Weak, Cell and RefCell",
+    "package": "lesson_19",
+    "args": [],
+    "diagnostic": "E0596",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 20,
+    "slug": "20_threads_send_sync_arc_and_locks",
+    "title": "Rust Threads, Send, Sync, Arc and Locks",
+    "package": "lesson_20",
+    "args": [],
+    "diagnostic": "E0277",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 21,
+    "slug": "21_channels_atomics_and_shutdown",
+    "title": "Rust Channels, Atomics and Worker Shutdown",
+    "package": "lesson_21",
+    "args": [],
+    "diagnostic": "E0382",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 22,
+    "slug": "22_async_await_and_future",
+    "title": "Rust async, await and Future",
+    "package": "lesson_22",
+    "args": [],
+    "diagnostic": "E0728",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 23,
+    "slug": "23_pin_unpin_and_async_boundaries",
+    "title": "Rust Pin, Unpin and Async Boundaries",
+    "package": "lesson_23",
+    "args": [],
+    "diagnostic": "E0277",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 24,
+    "slug": "24_declarative_and_procedural_macros",
+    "title": "Rust Declarative and Procedural Macros",
+    "package": "rust_macros",
+    "args": [],
+    "diagnostic": "E0308",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 25,
+    "slug": "25_attributes_cfg_features_and_editions",
+    "title": "Rust Attributes, cfg, Features and Editions",
+    "package": "rust_config",
+    "args": [],
+    "diagnostic": "E0425",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 26,
+    "slug": "26_unsafe_raw_pointers_and_ffi",
+    "title": "Rust Unsafe, Raw Pointers and FFI",
+    "package": "lesson_26",
+    "args": [],
+    "diagnostic": "E0133",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 27,
+    "slug": "27_files_arguments_and_linux_cli",
+    "title": "Rust Files, Arguments and a Linux CLI",
+    "package": "rust_cli",
+    "args": [
+      "readings.txt"
+    ],
+    "diagnostic": null,
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 28,
+    "slug": "28_raspberry_pi_system_status_project",
+    "title": "Rust Raspberry Pi System-Status Project",
+    "package": "pi_status",
+    "args": [
+      "--root",
+      "fixtures",
+      "--strict"
+    ],
+    "diagnostic": null,
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 29,
+    "slug": "29_reading_the_rust_reference",
+    "title": "Reading the Rust Reference",
+    "package": "lesson_29",
+    "args": [],
+    "diagnostic": "E0308",
+    "failure_kind": "compile",
+    "cpp_diagnostic": null
+  },
+  {
+    "number": 30,
+    "slug": "30_rust_cpp_values_ownership_and_raii",
+    "title": "Rust vs C++: Values, Ownership and RAII",
+    "package": "lesson_30",
+    "args": [],
+    "diagnostic": "E0382",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "use of deleted function"
+  },
+  {
+    "number": 31,
+    "slug": "31_rust_cpp_borrowing_const_and_lifetimes",
+    "title": "Rust Borrowing vs C++ const: References and Lifetimes",
+    "package": "lesson_31",
+    "args": [],
+    "diagnostic": "E0506",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "assignment of read-only reference"
+  },
+  {
+    "number": 32,
+    "slug": "32_rust_cpp_traits_generics_and_dispatch",
+    "title": "Rust Traits vs C++ Interfaces: Generics and Dispatch",
+    "package": "lesson_32",
+    "args": [],
+    "diagnostic": "E0308",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "inconsistent deduction for auto return type"
+  },
+  {
+    "number": 33,
+    "slug": "33_rust_cpp_errors_exceptions_and_contracts",
+    "title": "Rust Result and C++ Exceptions: Error Contracts",
+    "package": "lesson_33",
+    "args": [],
+    "diagnostic": "E0277",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "cannot convert"
+  },
+  {
+    "number": 34,
+    "slug": "34_rust_moves_vs_cpp_move_semantics",
+    "title": "Rust Moves vs C++ Move Semantics",
+    "package": "lesson_34",
+    "args": [],
+    "diagnostic": "E0507",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "use of deleted function"
+  },
+  {
+    "number": 35,
+    "slug": "35_rust_cpp_address_stability_and_pin",
+    "title": "Rust Pin and C++ Address Stability",
+    "package": "lesson_35",
+    "args": [],
+    "diagnostic": "E0277",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "use of deleted function"
+  },
+  {
+    "number": 36,
+    "slug": "36_rust_strategy_functions_traits_and_dispatch",
+    "title": "Strategy in Rust: Functions, Closures and Traits",
+    "package": "lesson_36",
+    "args": [],
+    "diagnostic": "E0308",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "cannot convert"
+  },
+  {
+    "number": 37,
+    "slug": "37_rust_state_enums_and_typestate",
+    "title": "State in Rust: Enums and Typestate",
+    "package": "lesson_37",
+    "args": [],
+    "diagnostic": "E0599",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "has no member named"
+  },
+  {
+    "number": 38,
+    "slug": "38_rust_factory_builder_and_validated_construction",
+    "title": "Factory and Builder in Rust: Validated Construction",
+    "package": "lesson_38",
+    "args": [],
+    "diagnostic": "E0451",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "is private within this context"
+  },
+  {
+    "number": 39,
+    "slug": "39_rust_visitor_enums_and_open_behaviour",
+    "title": "Visitor in Rust: Enums and Open Behaviour",
+    "package": "lesson_39",
+    "args": [],
+    "diagnostic": "E0004",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "abstract type"
+  },
+  {
+    "number": 40,
+    "slug": "40_rust_observer_events_and_shutdown",
+    "title": "Observer in Rust: Events and Shutdown",
+    "package": "lesson_40",
+    "args": [],
+    "diagnostic": "E0373",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "must be copy-constructible"
+  },
+  {
+    "number": 41,
+    "slug": "41_rust_ownership_ids_and_ecs_design",
+    "title": "Rust Ownership, IDs and ECS Design",
+    "package": "lesson_41",
+    "args": [],
+    "diagnostic": "E0382",
+    "failure_kind": "compile",
+    "cpp_diagnostic": "use of deleted function"
+  }
+]

@@ -1,0 +1,3 @@
+platform=linux
+detailed=false
+46700 mC

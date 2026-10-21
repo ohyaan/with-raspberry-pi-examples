@@ -1,0 +1,5 @@
+future created; input length=3
+measured=2, missing=1
+zero=Some(0)
+invalid rejected=true
+owned label bytes=5

@@ -1,0 +1,4 @@
+readings=[(0, Some(46700)), (1, None), (2, Some(0))]
+sent=3
+commands=[0, -500]
+published=46700

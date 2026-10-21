@@ -1,0 +1,4 @@
+measured=4, missing=1, invalid=2, notice=2
+zero=Ok(Some(0))
+empty=Ok(None)
+invalid rejected=true

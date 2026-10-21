@@ -1,0 +1,2 @@
+memory_total_kib=4096, memory_available_kib=1024, memory_used_estimate_kib=3072
+thermal_zone="cpu-thermal", temperature_mC=46700

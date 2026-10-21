@@ -1,0 +1,4 @@
+matched positions=2,8
+reused=1, stale=1
+foreign rejected=1
+retired slot=1

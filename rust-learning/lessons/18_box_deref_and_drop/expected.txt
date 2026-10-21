@@ -1,0 +1,13 @@
+boxed=46700
+list length=2, sum=46700
+boxed text bytes=5
+label bytes=5
+drop=first
+after early drop
+second bytes=6
+drop=second
+after scope
+both alive
+drop=inner
+drop=outer
+finished

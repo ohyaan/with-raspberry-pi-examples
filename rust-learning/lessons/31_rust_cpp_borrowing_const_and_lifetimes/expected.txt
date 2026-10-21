@@ -1,0 +1,4 @@
+before=46700, after=-500
+inspections=2
+label bytes=5
+after borrow=1

@@ -1,0 +1,7 @@
+state=below threshold
+state=notice
+state=missing
+state=invalid
+reason=not a number
+measured=46700
+no measured value

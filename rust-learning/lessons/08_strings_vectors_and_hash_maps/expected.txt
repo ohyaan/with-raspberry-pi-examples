@@ -1,0 +1,7 @@
+Pi 4B: 3 readings
+first=Some(46700)
+out-of-range=None
+previous=None
+Pi 4B=46700
+Pi 5=missing
+Unicode fixture: bytes=2, scalars=1

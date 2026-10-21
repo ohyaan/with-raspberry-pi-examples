@@ -1,0 +1,4 @@
+generic=46700
+dynamic=46700
+present=2, missing=1, sum=46200
+factory=0

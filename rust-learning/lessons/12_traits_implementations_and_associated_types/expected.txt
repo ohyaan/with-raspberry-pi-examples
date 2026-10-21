@@ -1,0 +1,5 @@
+Pi 4B: 46700 mC
+Pi 4B: online status
+missing (mC)
+integer=Some(46700)
+unit=mC

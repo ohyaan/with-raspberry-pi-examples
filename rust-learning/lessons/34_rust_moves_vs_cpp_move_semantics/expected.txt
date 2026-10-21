@@ -1,0 +1,6 @@
+owned=46700
+reused=0
+slot empty=true, value=-500
+repeated=5,5
+consumed=5
+copied=7,7

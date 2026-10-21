@@ -1,3 +1,6 @@
 **/build/
 **/CMakeUserPresets.json
 **/compile_commands.json
+**/target/
+**/__pycache__/
+rust-learning/failures/**/Cargo.lock

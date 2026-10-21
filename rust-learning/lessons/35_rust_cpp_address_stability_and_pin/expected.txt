@@ -1,0 +1,5 @@
+owner transfer=true
+collection growth=true
+reading=46700
+updated=0
+ordinary bytes=5

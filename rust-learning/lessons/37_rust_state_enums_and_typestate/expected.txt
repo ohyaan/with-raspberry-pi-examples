@@ -1,0 +1,6 @@
+before ready rejected=true
+runtime closed count=2
+after close rejected=true
+typed closed count=2
+zero retained=true
+negative retained=true

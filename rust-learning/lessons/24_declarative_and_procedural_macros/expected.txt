@@ -1,0 +1,4 @@
+readings=[46700, 0, -500]
+checked=Some(0)
+name=Pi
+debug=Status { reading: 46700 }

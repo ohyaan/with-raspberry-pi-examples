@@ -1,0 +1,5 @@
+same pointee=true, label=Pi 4B
+Unpin text=Pi 4B
+observed=46700, polls=2
+erased values=[46700, 0]
+borrowed bytes=5

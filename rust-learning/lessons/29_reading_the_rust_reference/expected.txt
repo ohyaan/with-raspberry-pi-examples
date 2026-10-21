@@ -1,0 +1,3 @@
+alias accepts i32=46700
+newtype display=46.7 C
+distinct Celsius=46

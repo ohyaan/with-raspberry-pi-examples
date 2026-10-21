@@ -1,0 +1,3 @@
+readings: 46700, 46700
+labels: Pi 4B, Pi 4B
+device=Pi 4B
