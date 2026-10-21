@@ -1,0 +1,10 @@
+    Variable 'num' (value = 42)
+          │
+          ▼
+    ┌───────────┐
+    │    42     │  ◄── Memory Value
+    └───────────┘
+     0x7ffd51a0    ◄── Memory Address (Hexadecimal)
+          ▲
+          │
+      int* ptr     ◄── Pointer variable containing 0x7ffd51a0

@@ -1,0 +1,6 @@
+       Instance of Circle:
+       ┌──────────────┐
+       │   vptr       │ ───────&gt; [ Class Circle Vtable ]
+       ├──────────────┤          ┌──────────────────────────┐
+       │  (data members)│          │ Circle::draw() pointer   │
+       └──────────────┘          └──────────────────────────┘

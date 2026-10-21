@@ -1,0 +1,12 @@
+       1. Pass-by-Value
+       ┌──────────────────┐
+       │   Copies Data    │ ◄── [Primitive types like int, double, bool]
+       └──────────────────┘
+       2. Pass-by-Reference
+       ┌──────────────────┐
+       │ Modifies Original│ ◄── [Output parameters / updating state]
+       └──────────────────┘
+       3. Pass-by-Const-Reference
+       ┌──────────────────┐
+       │  Zero-Copy/Read  │ ◄── [Large objects: std::string, std::vector]
+       └──────────────────┘

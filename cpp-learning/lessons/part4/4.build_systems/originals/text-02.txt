@@ -1,0 +1,13 @@
+  Static Library (.a / .lib)
+  ┌───────────┐     ┌───────────┐     ┌───────────────────────┐
+  │ app.o     │  +  │ lib.a     │ ──&gt; │ Compiled app (Large)  │
+  └───────────┘     └───────────┘     └───────────────────────┘
+                                      (Independent at runtime)
+                                      
+  Dynamic Library (.so / .dll)
+  ┌───────────┐     ┌───────────┐     ┌───────────────────────┐
+  │ app.o     │  +  │ lib.so    │ ──&gt; │ Compiled app (Small)  │
+  └───────────┘     └───────────┘     └───────────────────────┘
+                          │           (Requires lib.so file)
+                          ▼
+                    Loaded at Runtime

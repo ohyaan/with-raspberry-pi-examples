@@ -1,0 +1,373 @@
+[
+  {
+    "target": "part1_1_introduction_01",
+    "source": "lessons/part1/1.introduction/originals/cpp-01.cpp",
+    "standard": 20,
+    "expected": "Hello, Modern C++ on Raspberry Pi!\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_1_introduction_02",
+    "source": "lessons/part1/1.introduction/originals/cpp-02.cpp",
+    "standard": 20,
+    "expected": "Enter your age: Enter your full name: \nHello, Ada Lovelace! You are 36 years old.\n",
+    "stdin": "36\nAda Lovelace\n",
+    "optional": false
+  },
+  {
+    "target": "part1_2_basic_syntax_06",
+    "source": "lessons/part1/2.basic_syntax/originals/cpp-06.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_2_basic_syntax_07",
+    "source": "lessons/part1/2.basic_syntax/originals/cpp-07.cpp",
+    "standard": 20,
+    "expected": "X: 3.5, Y: 4.2\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_3_control_flow_05",
+    "source": "lessons/part1/3.control_flow/originals/cpp-05.cpp",
+    "standard": 20,
+    "expected": "regex:Processing a direct value: 100\\nProcessing a pointer\\. Address: 0x[0-9a-f]+, Value: 100\\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_4_functions_02",
+    "source": "lessons/part1/4.functions/originals/cpp-02.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_4_functions_07",
+    "source": "lessons/part1/4.functions/originals/cpp-07.cpp",
+    "standard": 20,
+    "expected": "Inside lambda: 11\nOutside lambda: 10\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_4_functions_08",
+    "source": "lessons/part1/4.functions/originals/cpp-08.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_4_functions_09",
+    "source": "lessons/part1/4.functions/originals/cpp-09.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_5_operators_05",
+    "source": "lessons/part1/5.operators/originals/cpp-05.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_5_operators_06",
+    "source": "lessons/part1/5.operators/originals/cpp-06.cpp",
+    "standard": 20,
+    "expected": "v1 is older than v2\nVersions are different\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_6_pointers_references_01",
+    "source": "lessons/part1/6.pointers_references/originals/cpp-01.cpp",
+    "standard": 20,
+    "expected": "regex:Value of num: 42\\nAddress of num \\(&num\\): (0x[0-9a-f]+)\\nPointer value \\(ptr\\): \\1\\nValue pointed to \\(\\*ptr\\): 42\\nNew value of num: 99\\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part1_6_pointers_references_08",
+    "source": "lessons/part1/6.pointers_references/originals/cpp-08.cpp",
+    "standard": 20,
+    "expected": "arr[0] via pointer: 10\narr[1] via pointer: 20\narr[3] via offset: 40\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part2_1_memory_management_09",
+    "source": "lessons/part2/1.memory_management/originals/cpp-09.cpp",
+    "standard": 20,
+    "expected": "regex:Source size: [0-9]+\\nDestination size: 5\\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part2_2_classes_objects_06",
+    "source": "lessons/part2/2.classes_objects/originals/cpp-06.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_1_templates_01",
+    "source": "lessons/part3/1.templates/originals/cpp-01.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_1_templates_07",
+    "source": "lessons/part3/1.templates/originals/cpp-07.cpp",
+    "standard": 20,
+    "expected": "Buffer capacity: 256\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_1_templates_08",
+    "source": "lessons/part3/1.templates/originals/cpp-08.cpp",
+    "standard": 20,
+    "expected": "Sum: 10.7\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_1_containers_03",
+    "source": "lessons/part3/1.containers/originals/cpp-03.cpp",
+    "standard": 20,
+    "expected": "Alice: 25\nCharlie: 30\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_1_containers_04",
+    "source": "lessons/part3/1.containers/originals/cpp-04.cpp",
+    "standard": 20,
+    "expected": "10 20 30 \n30 20 10 \n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_1_containers_05",
+    "source": "lessons/part3/1.containers/originals/cpp-05.cpp",
+    "standard": 20,
+    "expected": "Log: Heap allocated string\nLog: Literal string\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_1_containers_06",
+    "source": "lessons/part3/1.containers/originals/cpp-06.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_2_algorithms_01",
+    "source": "lessons/part3/2.algorithms/originals/cpp-01.cpp",
+    "standard": 20,
+    "expected": "Found value: 8\nFirst value > 15: 23\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_2_algorithms_03",
+    "source": "lessons/part3/2.algorithms/originals/cpp-03.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_2_algorithms_05",
+    "source": "lessons/part3/2.algorithms/originals/cpp-05.cpp",
+    "standard": 20,
+    "expected": "Has 5: true\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_2_algorithms_06",
+    "source": "lessons/part3/2.algorithms/originals/cpp-06.cpp",
+    "standard": 20,
+    "expected": "",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part3_2_algorithms_07",
+    "source": "lessons/part3/2.algorithms/originals/cpp-07.cpp",
+    "standard": 20,
+    "expected": "4 16 36 64 100 \n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part4_1_modern_utilities_01",
+    "source": "lessons/part4/1.modern_utilities/originals/cpp-01.cpp",
+    "standard": 20,
+    "expected": "Sensor ID: 105\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part4_1_modern_utilities_02",
+    "source": "lessons/part4/1.modern_utilities/originals/cpp-02.cpp",
+    "standard": 20,
+    "expected": "String: Pi in sky\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part4_1_modern_utilities_03",
+    "source": "lessons/part4/1.modern_utilities/originals/cpp-03.cpp",
+    "standard": 20,
+    "expected": "Double: 3.14\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part4_1_modern_utilities_04",
+    "source": "lessons/part4/1.modern_utilities/originals/cpp-04.cpp",
+    "standard": 20,
+    "expected": "Flexible storage\n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part4_2_cpp20_04",
+    "source": "lessons/part4/2.cpp20/originals/cpp-04.cpp",
+    "standard": 20,
+    "expected": "40 60 80 \n",
+    "stdin": "",
+    "optional": false
+  },
+  {
+    "target": "part4_2_cpp20_07",
+    "source": "lessons/part4/2.cpp20/originals/cpp-07.cpp",
+    "standard": 20,
+    "expected": "GPIO Pin 18 temp is 24.6C\n",
+    "stdin": "",
+    "optional": true
+  },
+  {
+    "target": "part4_3_cpp23_03",
+    "source": "lessons/part4/3.cpp23/originals/cpp-03.cpp",
+    "standard": 23,
+    "expected": "",
+    "stdin": "",
+    "optional": true
+  },
+  {
+    "target": "part4_3_cpp23_04",
+    "source": "lessons/part4/3.cpp23/originals/cpp-04.cpp",
+    "standard": 23,
+    "expected": "",
+    "stdin": "",
+    "optional": true
+  },
+  {
+    "target": "part4_3_cpp23_05",
+    "source": "lessons/part4/3.cpp23/originals/cpp-05.cpp",
+    "standard": 23,
+    "expected": "",
+    "stdin": "",
+    "optional": true
+  },
+  {
+    "target": "part1_5_operators_checked_operators",
+    "source": "lessons/part1/5.operators/checked_operators.cpp",
+    "standard": 20,
+    "optional": false,
+    "expected": "",
+    "stdin": "",
+    "adapter": true
+  },
+  {
+    "target": "part2_1_memory_management_checked_ownership",
+    "source": "lessons/part2/1.memory_management/checked_ownership.cpp",
+    "standard": 20,
+    "optional": false,
+    "expected": "Device active\n100\nValue: 7\nResource has already been deleted.\nNode destroyed\nNode destroyed\n",
+    "stdin": "",
+    "adapter": true
+  },
+  {
+    "target": "part2_2_classes_objects_checked_classes",
+    "source": "lessons/part2/2.classes_objects/checked_classes.cpp",
+    "standard": 20,
+    "optional": false,
+    "expected": "PASS checked_classes\n",
+    "stdin": "",
+    "adapter": true
+  },
+  {
+    "target": "part2_3_inheritance_checked_polymorphism",
+    "source": "lessons/part2/3.inheritance/checked_polymorphism.cpp",
+    "standard": 20,
+    "optional": false,
+    "expected": "Pi powering on.\nCapturing at 8MP.\nDrawing a circle.\nNot a dog!\n",
+    "stdin": "",
+    "adapter": true
+  },
+  {
+    "target": "part2_4_operator_overloading_checked_overloads",
+    "source": "lessons/part2/4.operator_overloading/checked_overloads.cpp",
+    "standard": 20,
+    "optional": false,
+    "expected": "PASS checked_overloads\n",
+    "stdin": "",
+    "adapter": true
+  },
+  {
+    "target": "part3_1_templates_checked_templates",
+    "source": "lessons/part3/1.templates/checked_templates.cpp",
+    "standard": 20,
+    "optional": false,
+    "expected": "4 is a generic value.\ntrue is a boolean value.\n9\n",
+    "stdin": "",
+    "adapter": true
+  },
+  {
+    "target": "part4_2_cpp20_checked_concepts",
+    "source": "lessons/part4/2.cpp20/checked_concepts.cpp",
+    "standard": 20,
+    "optional": false,
+    "expected": "42\n",
+    "stdin": "",
+    "adapter": true
+  },
+  {
+    "target": "part4_3_cpp23_checked_utilities",
+    "source": "lessons/part4/3.cpp23/checked_utilities.cpp",
+    "standard": 23,
+    "optional": true,
+    "expected": "",
+    "stdin": "",
+    "adapter": true
+  },
+  {
+    "target": "part4_3_cpp23_uncommented_print",
+    "source": "lessons/part4/3.cpp23/uncommented_print.cpp",
+    "standard": 23,
+    "optional": true,
+    "expected": "Processing complete. Speed: 4.2 m/s\n",
+    "stdin": "",
+    "adapter": true
+  }
+, {"target":"demo","source":"lessons/part1/1.introduction/cmake-demo/src/main.cpp","standard":20,"expected":"Hello, Modern C++ on Raspberry Pi!\n","stdin":"","existing":true}
+, {"target":"app","source":"lessons/part4/4.build_systems/cmake-demo/src/main.cpp","standard":20,"expected":"fixture=42\n","stdin":"","existing":true,"adapter":true}
+]

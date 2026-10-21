@@ -1,0 +1,13 @@
+[Source Code: main.cpp]
+        │
+        ▼ (Stage 1: Preprocessor - resolves #include and #define)
+[Preprocessed Source: main.i]
+        │
+        ▼ (Stage 2: Compiler - translates C++ syntax to CPU instructions)
+[Assembly Code: main.s]
+        │
+        ▼ (Stage 3: Assembler - translates assembly to machine instructions)
+[Object File: main.o (ELF binary format)]
+        │
+        ▼ (Stage 4: Linker - merges object files and standard libraries)
+[Executable Binary: hello (runnable by OS)]

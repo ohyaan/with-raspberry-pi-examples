@@ -1,0 +1,30 @@
+# Classes and Objects
+
+[Read the article](https://ohyaan.github.io/cpp-learning/part2/2.classes_objects/) for the explanation and [original blocks](originals/) for exact source snapshots.
+
+## Build and run
+
+From the category root (`cpp-learning/`):
+
+```bash
+cmake --preset native-debug
+cmake --build --preset native-debug --parallel 2
+ctest --preset native-debug --output-on-failure
+```
+
+Executable files are in `build/native/debug/`. Use the table below to select an example. The category README explains Release builds and explicit skips.
+
+| Target | Standard | Check scope |
+|---|---|---|
+| `part2_2_classes_objects_06` | C++20 | Original build/run smoke check |
+| `part2_2_classes_objects_checked_classes` | C++20 | Supplementary checked driver |
+
+## Important boundary
+
+The raw Buffer copy/move fragments are reading-only, not validated container implementations. Their uninitialized elements and exception paths need a separate redesign.
+
+## Reading-only versus executable code
+
+The originals/ directory also contains incomplete declarations, statement fragments and illustrative commands. It is not a list of programs to run automatically. Only the named CMake targets are runnable examples. Empty-output originals are smoke checks, not assertions of local variable values.
+
+Supplementary drivers include the relevant original blocks and add only the missing context/checks. [Verification scope](../../../VERIFICATION.md) records actual results and skips; [category instructions](../../../README.md) describe source equality and failure checks.

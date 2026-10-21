@@ -1,0 +1,58 @@
+[
+  {
+    "name": "null_overload",
+    "lesson": "part1/6.pointers_references",
+    "source": "failures/null_overload.cpp",
+    "standard": 20,
+    "diagnostic": "ambiguous"
+  },
+  {
+    "name": "const_pointee",
+    "lesson": "part1/6.pointers_references",
+    "source": "failures/const_pointee.cpp",
+    "standard": 20,
+    "diagnostic": "read-only"
+  },
+  {
+    "name": "copy_unique",
+    "lesson": "part2/1.memory_management",
+    "source": "failures/copy_unique.cpp",
+    "standard": 20,
+    "diagnostic": "deleted"
+  },
+  {
+    "name": "abstract_sensor",
+    "lesson": "part2/3.inheritance",
+    "source": "failures/abstract_sensor.cpp",
+    "standard": 20,
+    "diagnostic": "abstract"
+  },
+  {
+    "name": "inherit_final",
+    "lesson": "part2/3.inheritance",
+    "source": "failures/inherit_final.cpp",
+    "standard": 20,
+    "diagnostic": "final"
+  },
+  {
+    "name": "integral_constraint",
+    "lesson": "part4/2.cpp20",
+    "source": "failures/integral_constraint.cpp",
+    "standard": 20,
+    "diagnostic": "constraints not satisfied|no matching function"
+  },
+  {
+    "name": "nonconstant_constexpr",
+    "lesson": "part1/2.basic_syntax",
+    "source": "failures/nonconstant_constexpr.cpp",
+    "standard": 20,
+    "diagnostic": "non-.?constexpr|not.*constexpr"
+  },
+  {
+    "name": "runtime_consteval",
+    "lesson": "part1/4.functions",
+    "source": "failures/runtime_consteval.cpp",
+    "standard": 20,
+    "diagnostic": "constant expression"
+  }
+]

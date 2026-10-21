@@ -1,0 +1,9 @@
+  std::vector / std::array (Contiguous Memory Layout)
+  ┌───┬───┬───┬───┬───┐
+  │ 0 │ 1 │ 2 │ 3 │ 4 │  ◄── Quick random access (index)
+  └───┴───┴───┴───┴───┘
+  
+  std::list (Non-Contiguous Link Nodes)
+  ┌────┐     ┌────┐     ┌────┐
+  │Node│ ──&gt; │Node│ ──&gt; │Node│  ◄── Slow index access (must traverse list)
+  └────┘     └────┘     └────┘

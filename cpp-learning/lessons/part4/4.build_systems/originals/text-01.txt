@@ -1,0 +1,7 @@
+       Target (File to create)
+         │
+         ▼
+     my_program : main.o utils.o  ◄── Dependencies (Prerequisites)
+    ┌───────────────────────────┐
+    │  $(CXX) -o my_program ... │  ◄── Command (Must be preceded by a TAB character)
+    └───────────────────────────┘

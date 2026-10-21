@@ -1,0 +1,6 @@
+                           A <=> B
+                              │
+             ┌────────────────┼────────────────┐
+             ▼                ▼                ▼
+          Result < 0       Result == 0      Result > 0
+         (Meaning A < B)  (Meaning A == B) (Meaning A > B)

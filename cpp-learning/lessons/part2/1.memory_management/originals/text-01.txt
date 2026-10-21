@@ -1,0 +1,11 @@
+    High Memory Addresses
+    ┌───────────────────────────┐
+    │          Stack            │  ◄── Local variables, grows downwards
+    │            │              │
+    │            ▼              │
+    │                           │
+    │            ▲              │
+    │            │              │
+    │          Heap             │  ◄── Dynamic variables (new/malloc), grows upwards
+    └───────────────────────────┘
+    Low Memory Addresses

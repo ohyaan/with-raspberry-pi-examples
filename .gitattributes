@@ -1,0 +1,2 @@
+# Preserve verbatim whitespace in existing article snapshots; new code uses normal checks.
+cpp-learning/**/originals/* whitespace=-blank-at-eol,-blank-at-eof
