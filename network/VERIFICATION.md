@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all eight current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all nine current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -40,3 +40,13 @@ TCP coverage includes separate real client/server processes, empty and 1024-byte
 The one-byte peer verifies incremental processing of a request before EOF. The multiple-write reply check verifies the assembled echo; it does not assume a fixed relationship between peer writes, TCP packets and client receive calls. The programs have 128-byte receive buffers, so the 1024-byte case also requires receive loops.
 
 Each sample uses raw descriptors, blocking socket calls, Linux `SO_RCVTIMEO`/`SO_SNDTIMEO`, explicit cleanup and no custom headers. The timeouts apply to individual calls, not a whole-session deadline. Verification was on loopback only, without throughput measurements or induced IP packet loss.
+
+## TCP message framing lesson
+
+Verified on 22 October 2026 with the same host and Pi toolchains. With the length-prefixed client added, **41/41 CTest cases passed in Debug and Release on both machines**, with no skipped cases. The added 15 cases use an independent Python `struct.pack('!I', length)` wire oracle and the earlier raw byte-echo server.
+
+Framing checks cover normal, empty, 64-byte and UTF-8 payloads; single-byte and combined peer writes; parsing each frame while the peer's write side remains open; truncated headers and payloads; an oversized advertised length rejected before EOF; missing and extra frames; a mismatched body; invalid arguments; and an idle receive timeout. The default three-byte receive buffer guarantees that a four-byte header spans reads. Peer write sizes do not imply TCP packet sizes or a fixed receive-call count.
+
+On the Pi, the TCP server and new framing client were also compiled directly with `c++ -std=c++20 -Wall -Wextra -Wpedantic`, without custom headers or additional libraries. Normal echo, empty payloads and frame parsing before peer EOF passed against these direct-build binaries.
+
+clang-format 22.1.8 dry-run checks passed for all nine C++ files. The website source check confirms all nine exact article/source matches; the rendered-page audit validates all eight Network pages, including their code, navigation and links. Both new Mermaid diagrams were rendered as accessible SVGs in the preview browser. At a mobile viewport, only the diagram containers scroll horizontally, not the page body.
