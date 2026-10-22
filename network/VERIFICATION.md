@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all fifteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all sixteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -98,3 +98,13 @@ The accepted profile is bodyless GET requests and HTTP/1.0 or HTTP/1.1 responses
 On the Pi, the file was also compiled directly with the article's command. Completion while a peer stays open, a real file response, truncated-body rejection and the exact body-size limit passed against that binary. No public endpoint, system service or cryptographic implementation was used.
 
 All fifteen C++ files pass clang-format 22.1.8 checks and exact article/source matching. The website's 79 unit tests passed, and the rendered audit validates twelve Network pages and 2187 internal links/assets. The new Mermaid sequence rendered as an accessible SVG; mobile overflow is confined to its scroll container, and the complete-code disclosure opens correctly.
+
+## A small HTTP server
+
+Verified on 23 October 2026. **135/135 CTest cases passed in Debug and Release on the host and Raspberry Pi 4B**, with no skipped cases. Twenty new cases verify the one-request C++ server using the preceding C++ client, Python's HTTP client and raw TCP fixtures.
+
+Checks cover GET, HEAD, missing resources, a bodyless unsupported method with 405/Allow, split input, mixed-case fields, absent/duplicate/wrong authorities, unsupported request bodies and transfer coding, duplicate lengths, malformed syntax, truncation, request deadlines, invalid arguments and a bound-port conflict. The HEAD test was strengthened to collect all actual socket bytes and assert an empty body despite Content-Length 25, then rerun in Debug and Release on both machines.
+
+The Pi also compiled the server and preceding client directly with the article commands; GET, raw HEAD and 405 checks passed against these binaries. The server serves a constant representation only, binds loopback, waits at most about 30 seconds for one connection and uses bounded request collection. It is not a general HTTP server: rejected input closes without a full HTTP error response, and Date generation, aliases, body handling and production teardown are outside its profile.
+
+All sixteen C++ files pass clang-format 22.1.8 and exact source/article checks. The website's 79 unit tests and rendered course audit passed. The GET/HEAD sequence rendered as an accessible Mermaid SVG; mobile layout and the full-code disclosure were checked in the preview browser.

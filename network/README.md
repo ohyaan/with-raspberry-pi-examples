@@ -33,6 +33,7 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 | [Multiple TCP Connections](https://ohyaan.github.io/network/09_multiple_tcp_connections/) | [app/tcp-multi](app/tcp-multi) | Server: `./build/native/debug/tcp_multi_server 9003`; then run `./build/native/debug/tcp_multi_client 9003` in another terminal. |
 | [Your First HTTP Request](https://ohyaan.github.io/network/10_first_http_request/) | [app/http-wire](app/http-wire) | Start `timeout 30s python3 -m http.server 8080 --bind 127.0.0.1 --protocol HTTP/1.1 --directory app/http-wire/www`; then run `./build/native/debug/http_wire_client 8080`. |
 | [HTTP Headers and Body Length](https://ohyaan.github.io/network/11_http_headers_and_body_length/) | [app/http-length](app/http-length) | Use the same Python fixture; run `./build/native/debug/http_length_client 8080`. |
+| [A Small HTTP Server](https://ohyaan.github.io/network/12_small_http_server/) | [app/http-server](app/http-server) | Server: `./build/native/debug/http_small_server 8081`; then run `./build/native/debug/http_length_client 8081`. Restart the server for each request. |
 
 ## What runs
 
@@ -51,6 +52,7 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 - `tcp_multi_client` opens two connections, keeps the first silent, and finishes an echo on the second before checking that the first remains open. It uses blocking calls with two-second Linux per-call timeouts and closes both descriptors. The earlier `tcp_echo_client` also works with the multi-client server.
 - `http_wire_client` sends a bodyless HTTP/1.1 GET with `Host` and `Connection: close`, without shutting down its write side. It captures the unchanged response through EOF, with an 8192-byte cap and a fixed receive deadline (default 3000 ms). Optional arguments select a visible ASCII path and a 1–10000 ms receive budget. It does not parse HTTP status or validate body framing; a complete reply held open deliberately reaches its deadline. The checked-in fixture directory contains only `hello.txt`.
 - `http_length_client` uses the same request and setup but parses a deliberately restricted HTTP/1.0 or HTTP/1.1 200/404 response profile: ASCII headers up to 4096 bytes and exactly one Content-Length of 0–4096 body bytes. It returns after that body, without peer EOF. Duplicate lengths, transfer/content encoding, malformed fields and other statuses are rejected rather than treated as generic HTTP. It closes after one response and does not parse surplus bytes as another response. A fixed receive deadline covers both headers and body.
+- `http_small_server` accepts one loopback HTTP/1.1 request and serves a constant `/hello.txt` representation. GET/HEAD return 200 or 404; other valid bodyless methods return 405 with Allow. HEAD advertises the GET length but sends no body. The request profile requires exactly one numeric loopback Host authority, no request body, ASCII syntax and at most 4096 header bytes. Invalid input is closed without a general HTTP error response. It does not serve files or implement a production server. Accept waits at most about 30 seconds; request collection has a fixed 3000 ms default budget (optional 1–10000 ms), and sends have separate per-call timeouts.
 
 Each sample is a self-contained `.cpp` with system and standard headers only. Raw integer descriptors and the relevant socket calls are visible in each program. The cleanup section runs after either success or an error; there is no custom socket class. UDP examples use nonblocking sockets and `poll`. The first TCP pair uses blocking sockets with Linux per-call timeouts: 30 seconds for accepting, then three seconds for connected I/O. These are not overall request deadlines. Earlier samples report signal interruptions as errors; the lifecycle client's receive loop instead retries with the original deadline. CMake links the lifecycle fixture against platform thread support for its sleeping waits.
 
@@ -89,9 +91,11 @@ Another 16 multi-client checks cover the idle/active demonstration, four simulta
 
 Eleven HTTP wire checks add a real Python HTTP/1.1 fixture, a missing resource, exact GET/Host/CRLF bytes, replies split across peer writes, binary capture, size and deadline limits, an empty reply, invalid input and connection refusal.
 
-Thirty-one HTTP length checks add completion while the peer stays open, zero-length and binary bodies, mixed-case names, whitespace, truncated headers and bodies, absent/duplicate/overflowing/oversized lengths, exact size limits, unsupported coding/status cases, malformed fields and ignored surplus bytes. The complete suite has **115 CTest cases**. This suite verifies the documented teaching profile, not full HTTP conformance.
+Thirty-one HTTP length checks add completion while the peer stays open, zero-length and binary bodies, mixed-case names, whitespace, truncated headers and bodies, absent/duplicate/overflowing/oversized lengths, exact size limits, unsupported coding/status cases, malformed fields and ignored surplus bytes. This suite verifies the documented teaching profile, not full HTTP conformance.
 
-See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these fifteen standalone C++ files exactly. In the website source checkout, check a samples clone with:
+Twenty HTTP server cases add C++ client interoperability, GET/HEAD/404/405, raw HEAD body absence, split input, authority validation, unsupported bodies/coding, malformed requests, deadlines and port errors. The complete suite has **135 CTest cases**.
+
+See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these sixteen standalone C++ files exactly. In the website source checkout, check a samples clone with:
 
 ```bash
 python -m scripts.check_network_examples /path/to/with-raspberry-pi-examples
