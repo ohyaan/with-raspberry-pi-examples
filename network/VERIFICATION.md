@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all sixteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all seventeen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -108,3 +108,13 @@ Checks cover GET, HEAD, missing resources, a bodyless unsupported method with 40
 The Pi also compiled the server and preceding client directly with the article commands; GET, raw HEAD and 405 checks passed against these binaries. The server serves a constant representation only, binds loopback, waits at most about 30 seconds for one connection and uses bounded request collection. It is not a general HTTP server: rejected input closes without a full HTTP error response, and Date generation, aliases, body handling and production teardown are outside its profile.
 
 All sixteen C++ files pass clang-format 22.1.8 and exact source/article checks. The website's 79 unit tests and rendered course audit passed. The GET/HEAD sequence rendered as an accessible Mermaid SVG; mobile layout and the full-code disclosure were checked in the preview browser.
+
+## Chunked HTTP bodies
+
+Verified on 23 October 2026. **167/167 CTest cases passed in host and Raspberry Pi 4B Debug and Release**, with no skipped cases. Thirty-two added cases validate the documented HTTP/1.1 200/404 chunked response profile, not general HTTP conformance.
+
+Cases cover the one-request Python fixture, combined/split wire data, empty and binary bodies, uppercase hexadecimal sizes, mixed-case coding fields, truncated size/data/final lines, invalid sizes, missing CRLF, decoded/aggregate/wire limits, conflicting framing, unsupported extensions/trailers/coding chains, deadlines and argument/connection failures. Successful synthetic peers stay open until the decoder returns. The decoded body limit and the final trailer-section terminator are checked independently from TCP EOF.
+
+The Pi also compiled this client directly; the fixture, split response, incomplete ending and exact decoded-body cap passed against that executable. Its raw socket calls and explicit cleanup remain in one file. The Python fixture is loopback-only and one-request; the article adds an outer process timeout rather than claiming per-call socket timeouts bound the whole process.
+
+All seventeen C++ files pass clang-format 22.1.8 and exact source/article matching. The website's 79 tests passed; the rendered audit validates fourteen Network pages and 2842 internal links/assets. The three-state diagram rendered as accessible Mermaid SVG with mobile overflow confined to its container, and the complete-code disclosure opens correctly. Anchor IDs are now cached during the audit to avoid reparsing the same HTML for every code-line link; cached and uncached audits agreed on the preceding lesson's link count.
