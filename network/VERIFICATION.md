@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all thirteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all fourteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -74,3 +74,15 @@ The server uses raw nonblocking descriptors, `accept4`, `poll`, per-client buffe
 On the Pi, both source files were also compiled directly using the article's commands, without additional libraries or include paths. The two-stream demo, four simultaneous binary streams, capacity rejection, reset isolation and slot reuse passed against those direct-build executables. Harnesses reaped their own child processes, and generated Pi binaries were subsequently cleaned. No persistent service was installed.
 
 clang-format 22.1.8 checks passed for all thirteen C++ files. All thirteen article/source blocks match exactly. The website's 79 unit tests passed; the rendered-page audit validates all ten Network pages and 1734 internal links/assets. Both new Mermaid diagrams rendered as accessible SVGs. Their mobile containers retain readable-width diagrams with horizontal scrolling, while the page body stays within the viewport. The demo-code disclosure opened correctly.
+
+## First HTTP request
+
+Verified on 23 October 2026 with the host and Raspberry Pi 4B toolchains above. With the raw HTTP client included, **84/84 CTest cases passed in Debug and Release on both machines**, with no skipped cases. Python 3.11 or later is now required for the HTTP fixture's protocol option.
+
+The eleven new checks include Python's actual HTTP/1.1 file server (200 and 404 responses), exact request bytes including Host and CRLF, split replies, binary capture, size limits, silent and trickling peers, a complete reply kept open, an empty response, invalid input and connection refusal. An additional assertion verifies that the client's write direction remains open after the request header terminator; all eleven HTTP cases were rerun on both machines and configurations after that assertion and the Python version requirement were added.
+
+On the Pi, the client was also compiled directly with the article's `c++` command. The real Python server's existing-file and missing-resource checks passed against that executable. All exchanges used loopback and only the checked-in fixture directory; harnesses reaped their own server processes.
+
+This is deliberately raw capture through EOF, not an HTTP parser. It does not validate status or body length, decode transfer coding, or support HTTPS. The held-open-response deadline check documents this limitation instead of treating TCP EOF as HTTP framing.
+
+All fourteen C++ files pass clang-format 22.1.8 checks and exact article/source matching. The website's 79 unit tests passed. Its rendered-page audit validates eleven Network pages and 1909 internal links/assets. The HTTP sequence rendered as an accessible Mermaid SVG, with mobile horizontal scrolling confined to the diagram container.

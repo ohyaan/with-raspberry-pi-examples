@@ -26,10 +26,11 @@ network_program(tcp_lifecycle_client app/tcp-lifecycle/client.cpp)
 network_program(tcp_lifecycle_server app/tcp-lifecycle/server.cpp)
 network_program(tcp_multi_server app/tcp-multi/server.cpp)
 network_program(tcp_multi_client app/tcp-multi/client.cpp)
+network_program(http_wire_client app/http-wire/client.cpp)
 find_package(Threads REQUIRED)
 target_link_libraries(tcp_lifecycle_server PRIVATE Threads::Threads)
 if(BUILD_TESTING)
-    find_package(Python3 REQUIRED COMPONENTS Interpreter)
+    find_package(Python3 3.11 REQUIRED COMPONENTS Interpreter)
     foreach(case IN ITEMS hello ipv4 ipv6 echo empty binary limit oversized truncation late loss bad_port occupied timeout)
         add_test(NAME network.${case}
             COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/check.py"
@@ -59,5 +60,11 @@ if(BUILD_TESTING)
             COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/check_tcp_multi.py"
                 "${case}" "$<TARGET_FILE_DIR:tcp_multi_server>")
         set_tests_properties(network.multi.${case} PROPERTIES TIMEOUT 12)
+    endforeach()
+    foreach(case IN ITEMS python_ok python_missing split binary oversized idle trickle hold_open empty invalid refused)
+        add_test(NAME network.http_wire.${case}
+            COMMAND "${Python3_EXECUTABLE}" "${PROJECT_SOURCE_DIR}/tests/check_http_wire.py"
+                "${case}" "$<TARGET_FILE_DIR:http_wire_client>")
+        set_tests_properties(network.http_wire.${case} PROPERTIES TIMEOUT 12)
     endforeach()
 endif()
