@@ -1,2 +1,5 @@
 /build/
 /CMakeUserPresets.json
+*.key
+*.csr
+*.srl

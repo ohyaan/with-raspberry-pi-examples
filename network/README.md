@@ -1,10 +1,10 @@
 # Network
 
-C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies and sequential connection reuse. TLS/HTTPS, WebSocket, DTLS and QUIC/HTTP/3 are planned.
+C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies and sequential connection reuse and verified TLS connections. HTTPS, WebSocket, DTLS and QUIC/HTTP/3 are planned.
 
 ## Requirements and build
 
-Use Linux, a C++20 compiler, CMake 3.28 or later, and Python 3.11 or later for checks. The HTTP fixture uses Python's `--protocol` option. No extra libraries are downloaded by CMake. Run these commands from this `network/` directory, not the repository root:
+Use Linux, a C++20 compiler, CMake 3.28 or later, OpenSSL 3.0 or later (development headers and libraries), and Python 3.11 or later with its ssl module for checks. Tests also require the `openssl` command. On Raspberry Pi OS / Debian, missing TLS development dependencies can be installed with `sudo apt install libssl-dev pkg-config`; inspect your setup before making administrative changes. The HTTP fixture uses Python's `--protocol` option. No extra libraries are downloaded by CMake. Run these commands from this `network/` directory, not the repository root:
 
 ```bash
 cmake --preset native-debug
@@ -36,8 +36,25 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 | [A Small HTTP Server](https://ohyaan.github.io/network/12_small_http_server/) | [app/http-server](app/http-server) | Server: `./build/native/debug/http_small_server 8081`; then run `./build/native/debug/http_length_client 8081`. Restart the server for each request. |
 | [Chunked HTTP Bodies](https://ohyaan.github.io/network/13_chunked_http_bodies/) | [app/http-chunked](app/http-chunked) | Start `timeout 35s python3 fixtures/http_chunked_server.py 8082`; then run `./build/native/debug/http_chunked_client 8082`. |
 | [HTTP Connection Reuse](https://ohyaan.github.io/network/14_http_connection_reuse/) | [app/http-reuse](app/http-reuse) | Use the Python HTTP/1.1 file fixture on port 8080; run `./build/native/debug/http_reuse_client 8080`. |
+| [Your First Verified TLS Connection](https://ohyaan.github.io/network/15_first_verified_tls_connection/) | [app/tls-echo](app/tls-echo) | See the TLS fixture commands below. |
+| [Certificates, Hostnames and Trust](https://ohyaan.github.io/network/16_certificates_hostnames_and_trust/) | [app/tls-echo](app/tls-echo), [tests](tests/check_tls_echo.py) | `ctest --preset native-debug -R network.tls_echo` |
+
+## TLS fixture
+
+Create disposable certificates outside the checkout and start the one-connection fixture in terminal A:
+
+```bash
+practice=$(mktemp -d /tmp/network-tls-practice.XXXXXX)
+python3 fixtures/tls_echo.py certs "$practice/certs"
+printf '%s\n' "$practice/certs"
+timeout 35s python3 fixtures/tls_echo.py serve 9443 "$practice/certs"
+```
+
+In terminal B, set `certs` to the printed absolute certificate-directory path and run `./build/native/debug/tls_echo_client 9443 "$certs/ca.pem"`. The fixture exits after one attempt; restart it before another. The practice CA is explicitly trusted only by that command. Do not install it into system trust or commit secret keys. Certificates expire after two days; generate fresh ones in a new directory as needed. This is not HTTPS or mutual TLS.
 
 ## What runs
+
+- `tls_echo_client` connects to IPv4 loopback with a nonblocking socket, requires TLS 1.3 and validates a certificate chain against the supplied CA file and a DNS identity (default localhost). SNI alone is not validation. It sends a fixed 16-byte message through OpenSSL, reads the exact echo and requires a two-way close_notify exchange. One fixed session budget (default 3000 ms, optional 1–10000) covers connect through shutdown, after local TLS/CA setup. `SSL_get_error` drives read/write polling. No crypto or certificate validation is implemented by the sample itself.
 
 - `hello_network` checks the language mode and prints two lines; it sends nothing.
 - `addresses` resolves its argument and creates an IPv4 UDP socket without sending data. Numeric loopback inputs need no external DNS.
@@ -58,7 +75,7 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 - `http_chunked_client` accepts HTTP/1.1 200/404 responses with exactly one chunked Transfer-Encoding and no Content-Length. A three-state decoder retains split size lines, data and final delimiters. Headers, decoded payload and complete wire capture are capped at 4096, 4096 and 16384 bytes respectively. Size lines contain 1–16 hexadecimal digits. Extensions, nonempty trailers, content coding and coding chains are explicitly outside this teaching profile. Completion does not need peer EOF; the client closes after one response. The included Python fixture handles one request on loopback; use the documented outer `timeout` process limit.
 - `http_reuse_client` connects once and performs two sequential GETs, first `/hello.txt`, then `/missing`. It finishes each restricted Content-Length response before sending the next request, rejects known unsolicited data and a first-response close option, and never reconnects or retries. The profile accepts HTTP/1.1 200/404, the previous header/body caps, no transfer/content coding and an absent or single keep-alive/close Connection option. Each response has its own fixed receive deadline (default 3000 ms, optional 1–10000); setup/send waits are separate. This is neither pipelining nor a general connection pool.
 
-Each sample is a self-contained `.cpp` with system and standard headers only. Raw integer descriptors and the relevant socket calls are visible in each program. The cleanup section runs after either success or an error; there is no custom socket class. UDP examples use nonblocking sockets and `poll`. The first TCP pair uses blocking sockets with Linux per-call timeouts: 30 seconds for accepting, then three seconds for connected I/O. These are not overall request deadlines. Earlier samples report signal interruptions as errors; the lifecycle client's receive loop instead retries with the original deadline. CMake links the lifecycle fixture against platform thread support for its sleeping waits.
+Each sample is a self-contained `.cpp` with standard/system headers and, for TLS, the maintained OpenSSL library. Raw integer descriptors and the relevant socket calls are visible in each program. The cleanup section runs after either success or an error; there is no custom socket class. UDP examples use nonblocking sockets and `poll`. The first TCP pair uses blocking sockets with Linux per-call timeouts: 30 seconds for accepting, then three seconds for connected I/O. These are not overall request deadlines. Earlier samples report signal interruptions as errors; the lifecycle client's receive loop instead retries with the original deadline. CMake links the lifecycle fixture against platform thread support for its sleeping waits.
 
 For example, from this directory, compile the echo pair directly without extra include paths or libraries:
 
@@ -68,7 +85,7 @@ c++ -std=c++20 -Wall -Wextra -Wpedantic app/udp-echo/server.cpp -o build/direct/
 c++ -std=c++20 -Wall -Wextra -Wpedantic app/udp-echo/client.cpp -o build/direct/udp_echo_client
 ```
 
-No root access, port forwarding or permanent service is needed. All communication checks use loopback; they do not validate LAN behaviour or real network loss. The name resolver accepts hostnames too and may consult the host's configured name services.
+Running the examples needs no root access, port forwarding or permanent service. Installing missing development packages is a separate administrative step. All communication checks use loopback; they do not validate LAN behaviour or real network loss. The name resolver accepts hostnames too and may consult the host's configured name services.
 
 ## Checks and verification
 
@@ -101,9 +118,9 @@ Twenty HTTP server cases add C++ client interoperability, GET/HEAD/404/405, raw 
 
 Thirty-three chunked cases add the fixture, split/coalesced input, empty/binary payloads, hexadecimal sizes including a maximum-length size line with split CRLF, truncated endings, malformed framing, conflicting headers, unsupported features, decoded/wire limits and deadlines.
 
-Fourteen reuse cases add a real persistent HTTP server, two sequential requests on one accepted socket, no prequeued second request, no extra accepted connection/retry, fragmented and empty responses, early closure, unsolicited bytes, invalid framing/status and per-response waits. The complete suite has **182 CTest cases**, covering the stated profiles rather than general HTTP conformance.
+Fourteen reuse cases add a real persistent HTTP server, two sequential requests on one accepted socket, no prequeued second request, no extra accepted connection/retry, fragmented and empty responses, early closure, unsolicited bytes, invalid framing/status and per-response waits. Eighteen TLS cases add the real CLI fixture, a split echo, wrong CA/name, absent or malformed trust files, TLS-version policy, a plaintext peer, deadlines in handshake/read/shutdown, slow progress, abrupt/truncated/wrong echoes, invalid arguments and refusal. Rejected identities must receive no application request. The complete suite has **200 CTest cases**, covering the stated teaching profiles rather than general protocol conformance or a cryptographic audit.
 
-See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these eighteen standalone C++ files exactly. In the website source checkout, check a samples clone with:
+See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these nineteen standalone C++ files exactly. In the website source checkout, check a samples clone with:
 
 ```bash
 python -m scripts.check_network_examples /path/to/with-raspberry-pi-examples

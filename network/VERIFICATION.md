@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all eighteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all nineteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. TLS uses the maintained OpenSSL library, not custom cryptography. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -130,3 +130,17 @@ Final review found that a maximum-length 16-digit chunk-size line followed by CR
 On the Pi, direct builds passed the persistent fixture, same-connection exchange, close refusal and truncated second response. The corrected chunked client was also compiled directly and its maximum-size-line split fixture passed. Harnesses reaped their own processes; no public listener or permanent service was installed.
 
 All eighteen C++ files pass clang-format 22.1.8 and exact article/source checks. The website's 79 tests passed; the rendered audit validates fifteen Network pages and 3168 internal links/assets. The reuse sequence rendered as accessible Mermaid SVG, with mobile overflow and the full-code disclosure checked in the preview browser. Website publication remains separate from these public examples commits.
+
+## Verified TLS connections and certificate identity
+
+Verified on 23 October 2026. **200/200 CTest cases passed in Debug and Release on both the development host and Raspberry Pi 4B**, with no skipped cases. The TLS client links against OpenSSL 3.5.5 on the host and 3.5.7 on the Pi. Existing compiler/CMake versions above are unchanged. These are API/interoperability checks on loopback, not a cryptographic audit or Internet deployment test.
+
+Eighteen new cases cover the actual one-connection CLI fixture, complete and bytewise echoes, an independent untrusted CA, wrong DNS identity, absent/malformed trust files, a TLS 1.2-only server rejected by this exercise's TLS 1.3 policy, plaintext on the TLS port, stalled handshake/read/shutdown, continuous progress past a fixed deadline, an abrupt TCP close without close_notify, a short clean response, wrong echo bytes, invalid arguments and connection refusal. The fixture case also verifies the public certificate offline for localhost and rejects wrong.example. Negative identity cases record every received application byte and require zero bytes. After strengthening that assertion, all eighteen TLS cases were rerun in both configurations on both machines.
+
+The Python peer uses its maintained ssl module; it is an independent application-level oracle, not an independent cryptographic implementation. All trust material is generated in private temporary directories. Practice certificates expire after two days. No practice CA was added to any system/browser trust store, and no generated key is committed.
+
+The Pi had the runtime but no libssl-dev package, and noninteractive sudo was unavailable. The exact matching official Raspberry Pi OS arm64 libssl-dev package (3.5.7-1~deb13u3+rpt1) was downloaded and unpacked **only in the test scratch directory**, without package installation or system changes. CMake used that package's generic and arm64-specific include directories plus the Pi's existing libssl.so.3/libcrypto.so.3. The first build identified the missing multiarch include path; the corrected builds and all results above include it. Readers with the normally installed development package do not need these scratch-directory flags.
+
+Both host and Pi also compiled the standalone source directly. The host used the article's pkg-config command; the Pi used equivalent explicit scratch include paths and its runtime-library paths. Against these direct builds, the real fixture, wrong CA, wrong hostname and slow-progress deadline cases passed. Test peers terminated or were reaped by their harness; generated Pi binaries were cleaned afterward. No permanent service or public listener was installed.
+
+All nineteen C++ files pass clang-format 22.1.8 and exact article/source matching. The website's 79 unit tests and rendered course audit passed. Both new diagrams rendered as accessible Mermaid SVGs. At mobile width, only the diagrams scroll horizontally; opening the complete-code disclosure does not widen the body. Site publication remains separate from this examples update.
