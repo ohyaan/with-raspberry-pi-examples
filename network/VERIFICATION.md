@@ -13,6 +13,8 @@ After replacing the shared-header version with raw socket descriptors and explic
 
 On the Pi, the README's two direct `c++` commands were also executed and the echo integration check passed against that pair.
 
+The sources were subsequently formatted with clang-format 22.1.8 using the category's `.clang-format`. Its dry-run check passed for all six files. The formatted sources were rebuilt on the development host, where all 14 Debug checks passed again; standalone syntax checks and article/source matching also passed. The earlier Pi results above precede this formatting update.
+
 Checks cover:
 
 - The first program's complete output and IPv4/IPv6 numeric-address formatting.

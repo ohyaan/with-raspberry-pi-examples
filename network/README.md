@@ -51,6 +51,21 @@ No root access, port forwarding or permanent service is needed. All communicatio
 
 ## Checks and verification
 
+### Code formatting
+
+The category's [.clang-format](.clang-format) uses LLVM style, four-space indentation, an 80-column limit and braces around control statements. It was applied and checked with clang-format 22.1.8. Formatting is optional for building.
+
+From `network/`:
+
+```bash
+clang-format -i app/*/*.cpp
+clang-format --dry-run --Werror app/*/*.cpp
+```
+
+The article code blocks mirror these formatted files exactly.
+
+### Functional checks
+
 Fourteen CTest cases verify exact output, IPv4/IPv6 address formatting, normal/empty/binary/1024-byte echoes, oversized-message rejection, datagram truncation, scheduled reordering/loss/duplication, invalid ports, an occupied port and a silent peer timeout. Test peers use temporary ports. The test harness terminates its own server on failures.
 
 See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these six standalone C++ files exactly. In the website source checkout, check a samples clone with:
