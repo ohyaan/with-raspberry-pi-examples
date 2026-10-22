@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all nine current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all eleven current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -50,3 +50,15 @@ Framing checks cover normal, empty, 64-byte and UTF-8 payloads; single-byte and 
 On the Pi, the TCP server and new framing client were also compiled directly with `c++ -std=c++20 -Wall -Wextra -Wpedantic`, without custom headers or additional libraries. Normal echo, empty payloads and frame parsing before peer EOF passed against these direct-build binaries.
 
 clang-format 22.1.8 dry-run checks passed for all nine C++ files. The website source check confirms all nine exact article/source matches; the rendered-page audit validates all eight Network pages, including their code, navigation and links. Both new Mermaid diagrams were rendered as accessible SVGs in the preview browser. At a mobile viewport, only the diagram containers scroll horizontally, not the page body.
+
+## TCP disconnection and receive deadlines
+
+Verified on 22 October 2026 with the same host and Pi toolchains. With the standalone lifecycle pair included, **57/57 CTest cases passed in Debug and Release on both machines**, with no skipped cases. The longer-budget drip exercise was also rerun separately in host Debug and Release after being added to the harness.
+
+The 16 added cases cover clean EOF, a controlled Linux abortive reset, silent and slow peers, empty EOF, draining 1024 bytes before EOF, partial data followed by reset, rejection above the receive cap, invalid ports and budgets, connection refusal, a bound-port conflict, and invalid or absent fixture requests. A Python peer sends bytes repeatedly while keeping the connection open: the client must stop on its original 500 ms receive deadline rather than extending the wait after each read. Timing checks allow scheduler latency; they are not real-time guarantees. The drip case also checks that a 3000 ms budget reaches the fixture's eventual EOF.
+
+The server consumes the one-byte request before choosing a termination mode. Reset checks do not assume that bytes sent before RST remain recoverable. The receive loop uses `poll`, `recv(MSG_DONTWAIT)` and `steady_clock`; it checks the same deadline after readiness and retries. Setup waits have separate per-call timeouts. This does not verify a whole-request deadline, remote failure detection, or signal delivery under test.
+
+On the Pi, both files were also compiled directly using the article's commands, with `-pthread` for the sleeping server fixture. EOF, reset, idle, drip (short and long budgets) and the continuous-progress deadline fixture passed against those direct-build executables. All test children exited or were reaped by their harness; no background service was installed.
+
+clang-format 22.1.8 checks passed for all eleven C++ files. All eleven article/source blocks match exactly. The website's 79 unit tests passed, and the rendered-page audit validates all nine Network pages, including the folded fixture code and 1379 internal links/assets. Both lesson diagrams rendered as accessible Mermaid SVGs. The page body stayed within the viewport at normal and mobile widths, and the server-code disclosure opened correctly.

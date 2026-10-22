@@ -1,6 +1,6 @@
 # Network
 
-C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, a first TCP connection and length-prefixed message framing. More TCP lessons, HTTP, TLS/HTTPS, WebSocket, DTLS and QUIC/HTTP/3 are planned.
+C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, message framing, disconnection and receive deadlines. Multiple connections, HTTP, TLS/HTTPS, WebSocket, DTLS and QUIC/HTTP/3 are planned.
 
 ## Requirements and build
 
@@ -29,6 +29,7 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 | [Loss, Duplicates and Reordering](https://ohyaan.github.io/network/05_loss_duplicates_and_reordering/) | [app/udp-sequence](app/udp-sequence) | `./build/native/debug/udp_sequence late`, then `./build/native/debug/udp_sequence loss` |
 | [Your First TCP Connection](https://ohyaan.github.io/network/06_first_tcp_connection/) | [app/tcp-echo](app/tcp-echo) | Server: `./build/native/debug/tcp_echo_server 9001`; then client: `./build/native/debug/tcp_echo_client 9001 hello` |
 | [Message Boundaries in a TCP Stream](https://ohyaan.github.io/network/07_tcp_message_boundaries/) | [app/tcp-frames](app/tcp-frames) | Start `./build/native/debug/tcp_echo_server 9001`; then run `./build/native/debug/tcp_frames_client 9001` in another terminal. |
+| [Disconnection and Timeouts](https://ohyaan.github.io/network/08_tcp_disconnection_and_timeouts/) | [app/tcp-lifecycle](app/tcp-lifecycle) | Server: `./build/native/debug/tcp_lifecycle_server 9002 eof`; then client: `./build/native/debug/tcp_lifecycle_client 9002`. Restart the server with `reset`, `idle` or `drip` for the other outcomes. |
 
 ## What runs
 
@@ -41,8 +42,10 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 - `tcp_echo_server` accepts one IPv4 loopback connection and echoes at most 1024 bytes until the client's write-side EOF, then closes. It keeps listener and connection descriptors separate.
 - `tcp_echo_client` sends up to 1024 bytes, calls `shutdown(SHUT_WR)`, reads to EOF and checks the complete echo. Both programs loop over partial transfers and use `MSG_NOSIGNAL` for sends.
 - `tcp_frames_client` sends two frames through the same byte-echo server. Each frame has a four-byte network-order length and a payload of at most 64 bytes. Its three-byte receive buffer forces headers to span reads; a pending buffer retains incomplete frames. Write-side shutdown finishes the echo session, not individual messages. Empty payloads are valid frames, not TCP EOF.
+- `tcp_lifecycle_server` consumes a one-byte `?` request and reproduces clean EOF, an abortive Linux reset, silence or a slow three-byte response. It serves one client only. Silent and slow modes finish after about two seconds, using sleeping waits rather than CPU-spinning loops. `SO_LINGER={1,0}` is only a reset test fixture, not recommended cleanup.
+- `tcp_lifecycle_client` sends that request and observes the outcome with `poll` and `recv(MSG_DONTWAIT)`. Its fixed receive budget defaults to 1000 ms; an optional second argument accepts 1–10000 ms. Neither incoming bytes nor receive-loop interruptions renew it. Setup calls have separate Linux per-call timeouts; the receive budget is not a whole-request deadline. Output exit codes are 0 for EOF, 2 for reset, 3 for the local deadline and 1 for other errors. EOF is an observation, not validation of an application response.
 
-Each sample is a self-contained `.cpp` with system and standard headers only. Raw integer descriptors and the relevant socket calls are visible in each program. The cleanup section runs after either success or an error; there is no custom socket class. UDP examples use nonblocking sockets and `poll`. The first TCP pair uses blocking sockets with Linux per-call timeouts: 30 seconds for accepting, then three seconds for connected I/O. These are not overall request deadlines. A signal interruption is reported as an error rather than silently restarting a wait.
+Each sample is a self-contained `.cpp` with system and standard headers only. Raw integer descriptors and the relevant socket calls are visible in each program. The cleanup section runs after either success or an error; there is no custom socket class. UDP examples use nonblocking sockets and `poll`. The first TCP pair uses blocking sockets with Linux per-call timeouts: 30 seconds for accepting, then three seconds for connected I/O. These are not overall request deadlines. Earlier samples report signal interruptions as errors; the lifecycle client's receive loop instead retries with the original deadline. CMake links the lifecycle fixture against platform thread support for its sleeping waits.
 
 For example, from this directory, compile the echo pair directly without extra include paths or libraries:
 
@@ -71,9 +74,11 @@ The article code blocks mirror these formatted files exactly.
 
 ### Functional checks
 
-The suite has 41 CTest cases: 14 foundation/UDP cases, 12 TCP echo cases and 15 TCP framing cases. They verify exact output, address formatting, normal/empty/binary/1024-byte echoes, oversized-message rejection, datagram truncation, scheduled reordering/loss/duplication, invalid ports, port conflicts, partial TCP requests, multiple reply writes, half-close, premature EOF, connection refusal and idle I/O timeouts. Framing checks include empty/64-byte/UTF-8 payloads, bytewise and combined peer writes, parsing before peer EOF, truncated headers and bodies, immediate rejection of an oversized length, missing/extra frames and payload mismatch. They do not assume a fixed relationship between peer writes, TCP packets and receive calls. Test peers use temporary ports. The test harness terminates its own server or client on failures.
+The first 41 CTest cases comprise 14 foundation/UDP cases, 12 TCP echo cases and 15 TCP framing cases. They verify exact output, address formatting, normal/empty/binary/1024-byte echoes, oversized-message rejection, datagram truncation, scheduled reordering/loss/duplication, invalid ports, port conflicts, partial TCP requests, multiple reply writes, half-close, premature EOF, connection refusal and idle I/O timeouts. Framing checks include empty/64-byte/UTF-8 payloads, bytewise and combined peer writes, parsing before peer EOF, truncated headers and bodies, immediate rejection of an oversized length, missing/extra frames and payload mismatch. They do not assume a fixed relationship between peer writes, TCP packets and receive calls. Test peers use temporary ports. The test harness terminates its own server or client on failures.
 
-See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these nine standalone C++ files exactly. In the website source checkout, check a samples clone with:
+The additional 16 lifecycle checks cover EOF after queued data, reset, idle and slow peers, a non-renewing receive deadline, empty EOF, partial data before reset, the 1024-byte receive cap, invalid arguments, connection refusal, a bound-port conflict and invalid or missing fixture requests. The complete suite has **57 CTest cases**. Tests use broad timing bounds rather than asserting exact syscall timing.
+
+See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these eleven standalone C++ files exactly. In the website source checkout, check a samples clone with:
 
 ```bash
 python -m scripts.check_network_examples /path/to/with-raspberry-pi-examples
