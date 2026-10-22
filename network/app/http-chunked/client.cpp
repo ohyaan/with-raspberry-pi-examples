@@ -239,7 +239,8 @@ int main(int argc, char** argv) {
                 if (phase == Phase::Size) {
                     const auto line_end = response.find("\r\n", parse_at);
                     if (line_end == std::string::npos) {
-                        if (available > 16) {
+                        if (available > 17 ||
+                            (available == 17 && response.back() != '\r')) {
                             throw std::runtime_error(
                                 "chunk size line too long");
                         }

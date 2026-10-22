@@ -76,6 +76,7 @@ else:
         'trickle': (b'', b'receive deadline', None),
         'surplus': (header + wire + b'not another response', None, b'hello'),
         'body_limit': (header + b'1000\r\n' + b'x' * 4096 + b'\r\n0\r\n\r\n', None, b'x' * 4096),
+        'long_size_split': (header + b'0000000000000001\r', None, b'x'),
     }
     response, error, body = fixtures[case]
     with socket.socket() as listener:
@@ -107,7 +108,11 @@ else:
                     assert client.poll() is not None, 'progress renewed the budget'
                 else:
                     try:
-                        if case == 'split':
+                        if case == 'long_size_split':
+                            peer.sendall(response)
+                            time.sleep(0.05)
+                            peer.sendall(b'\nx\r\n0\r\n\r\n')
+                        elif case == 'split':
                             for byte in response:
                                 peer.sendall(bytes([byte]))
                         else:

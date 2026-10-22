@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all seventeen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all eighteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -118,3 +118,15 @@ Cases cover the one-request Python fixture, combined/split wire data, empty and 
 The Pi also compiled this client directly; the fixture, split response, incomplete ending and exact decoded-body cap passed against that executable. Its raw socket calls and explicit cleanup remain in one file. The Python fixture is loopback-only and one-request; the article adds an outer process timeout rather than claiming per-call socket timeouts bound the whole process.
 
 All seventeen C++ files pass clang-format 22.1.8 and exact source/article matching. The website's 79 tests passed; the rendered audit validates fourteen Network pages and 2842 internal links/assets. The three-state diagram rendered as accessible Mermaid SVG with mobile overflow confined to its container, and the complete-code disclosure opens correctly. Anchor IDs are now cached during the audit to avoid reparsing the same HTML for every code-line link; cached and uncached audits agreed on the preceding lesson's link count.
+
+## Sequential HTTP connection reuse and final boundary regression
+
+Verified on 23 October 2026. Fourteen reuse cases were added, followed by a chunk-size-line boundary regression. The final suite has **182/182 cases passed in Debug and Release on both the host and Raspberry Pi 4B**, with no skipped cases.
+
+Reuse checks include Python's persistent HTTP/1.1 server, two requests on one accepted socket, no queued second request before the first response, and no second accepted connection or implicit retry. Other cases cover fragmented and empty responses, a truncated second body, a close option, unsolicited data, missing/duplicate lengths, an unsupported second status, waits in either response and invalid arguments/refusal. The client is a restricted sequential Content-Length example, not a pipelining client or connection pool. A nonblocking peek is not claimed to guarantee future connection health.
+
+Final review found that a maximum-length 16-digit chunk-size line followed by CR, with LF arriving later, needed one extra buffered delimiter byte. The decoder and article were corrected, and a dedicated fixture now splits that exact boundary before completing a one-byte chunk. This increases chunked coverage from 32 to 33 cases. The entire 182-case suite was rerun after the correction, not only the new case.
+
+On the Pi, direct builds passed the persistent fixture, same-connection exchange, close refusal and truncated second response. The corrected chunked client was also compiled directly and its maximum-size-line split fixture passed. Harnesses reaped their own processes; no public listener or permanent service was installed.
+
+All eighteen C++ files pass clang-format 22.1.8 and exact article/source checks. The website's 79 tests passed; the rendered audit validates fifteen Network pages and 3168 internal links/assets. The reuse sequence rendered as accessible Mermaid SVG, with mobile overflow and the full-code disclosure checked in the preview browser. Website publication remains separate from these public examples commits.
