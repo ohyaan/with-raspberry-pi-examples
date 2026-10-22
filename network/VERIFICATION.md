@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all eleven current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all thirteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -62,3 +62,15 @@ The server consumes the one-byte request before choosing a termination mode. Res
 On the Pi, both files were also compiled directly using the article's commands, with `-pthread` for the sleeping server fixture. EOF, reset, idle, drip (short and long budgets) and the continuous-progress deadline fixture passed against those direct-build executables. All test children exited or were reaped by their harness; no background service was installed.
 
 clang-format 22.1.8 checks passed for all eleven C++ files. All eleven article/source blocks match exactly. The website's 79 unit tests passed, and the rendered-page audit validates all nine Network pages, including the folded fixture code and 1379 internal links/assets. Both lesson diagrams rendered as accessible Mermaid SVGs. The page body stayed within the viewport at normal and mobile widths, and the server-code disclosure opened correctly.
+
+## Multiple TCP connections with poll
+
+Verified on 22 October 2026 with the same host and Pi toolchains. With the standalone multi-client pair included, **73/73 CTest cases passed in Debug and Release on both machines**, with no skipped cases. All communication was IPv4 loopback; no throughput or LAN measurements were performed.
+
+The 16 added cases cover a completed echo while an earlier stream remains idle and open, normal/empty/1024-byte echoes, four simultaneous connections with distinct binary payloads, incremental echo before request EOF, reset isolation, rejection above the input cap, twelve successive slot reuses, rejection of a fifth accepted client, per-connection expiry, server expiry, invalid ports and budgets, port conflicts, connection refusal, and the demo client's rejection of a wrong echo or prematurely closed idle stream.
+
+The server uses raw nonblocking descriptors, `accept4`, `poll`, per-client buffers and send offsets in a single thread. A terminal peer error closes only that peer's descriptor. Input pauses while an echo chunk is unsent. The 1024-byte integration tests require several 256-byte receive chunks, but do not force a short `send()` return, fill kernel send buffers or constitute a backpressure performance test. The finite lifetime and capacity policies are teaching limits, not production service policies.
+
+On the Pi, both source files were also compiled directly using the article's commands, without additional libraries or include paths. The two-stream demo, four simultaneous binary streams, capacity rejection, reset isolation and slot reuse passed against those direct-build executables. Harnesses reaped their own child processes, and generated Pi binaries were subsequently cleaned. No persistent service was installed.
+
+clang-format 22.1.8 checks passed for all thirteen C++ files. All thirteen article/source blocks match exactly. The website's 79 unit tests passed; the rendered-page audit validates all ten Network pages and 1734 internal links/assets. Both new Mermaid diagrams rendered as accessible SVGs. Their mobile containers retain readable-width diagrams with horizontal scrolling, while the page body stays within the viewport. The demo-code disclosure opened correctly.
