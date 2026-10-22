@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all fourteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all fifteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -86,3 +86,15 @@ On the Pi, the client was also compiled directly with the article's `c++` comman
 This is deliberately raw capture through EOF, not an HTTP parser. It does not validate status or body length, decode transfer coding, or support HTTPS. The held-open-response deadline check documents this limitation instead of treating TCP EOF as HTTP framing.
 
 All fourteen C++ files pass clang-format 22.1.8 checks and exact article/source matching. The website's 79 unit tests passed. Its rendered-page audit validates eleven Network pages and 1909 internal links/assets. The HTTP sequence rendered as an accessible Mermaid SVG, with mobile horizontal scrolling confined to the diagram container.
+
+## HTTP headers and Content-Length
+
+Verified on 23 October 2026 with the same host and Pi toolchains. With the length-aware client added, **115/115 CTest cases passed in Debug and Release on both machines**, with no skipped cases. The 31 new cases use Python's actual HTTP server and independent byte fixtures; they validate only the documented restricted response profile, not general HTTP conformance.
+
+Coverage includes 200/404 replies, completion before peer EOF, empty and binary bodies, mixed-case field names, optional whitespace, partial headers, truncated bodies, absent/duplicate/conflicting/negative/overflowing/oversized lengths, exact header and body caps, unsupported transfer/content coding, invalid field/status syntax, a non-renewing receive budget, input validation, refusal and ignored surplus bytes. All successful synthetic response fixtures remain open until the client has returned. A 16-byte receive buffer guarantees that normal headers span multiple reads.
+
+The accepted profile is bodyless GET requests and HTTP/1.0 or HTTP/1.1 responses with status 200 or 404, ASCII headers of at most 4096 bytes, exactly one decimal Content-Length of 0–4096, and no transfer/content coding. Other statuses, missing lengths and duplicate lengths are rejected even when another valid HTTP interpretation could exist. The client closes after one body and does not reuse connections or process surplus bytes as another response.
+
+On the Pi, the file was also compiled directly with the article's command. Completion while a peer stays open, a real file response, truncated-body rejection and the exact body-size limit passed against that binary. No public endpoint, system service or cryptographic implementation was used.
+
+All fifteen C++ files pass clang-format 22.1.8 checks and exact article/source matching. The website's 79 unit tests passed, and the rendered audit validates twelve Network pages and 2187 internal links/assets. The new Mermaid sequence rendered as an accessible SVG; mobile overflow is confined to its scroll container, and the complete-code disclosure opens correctly.

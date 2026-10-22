@@ -1,6 +1,6 @@
 # Network
 
-C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients and a first HTTP request. Further HTTP lessons, TLS/HTTPS, WebSocket, DTLS and QUIC/HTTP/3 are planned.
+C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP requests and bounded Content-Length response parsing. Further HTTP lessons, TLS/HTTPS, WebSocket, DTLS and QUIC/HTTP/3 are planned.
 
 ## Requirements and build
 
@@ -32,6 +32,7 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 | [Disconnection and Timeouts](https://ohyaan.github.io/network/08_tcp_disconnection_and_timeouts/) | [app/tcp-lifecycle](app/tcp-lifecycle) | Server: `./build/native/debug/tcp_lifecycle_server 9002 eof`; then client: `./build/native/debug/tcp_lifecycle_client 9002`. Restart the server with `reset`, `idle` or `drip` for the other outcomes. |
 | [Multiple TCP Connections](https://ohyaan.github.io/network/09_multiple_tcp_connections/) | [app/tcp-multi](app/tcp-multi) | Server: `./build/native/debug/tcp_multi_server 9003`; then run `./build/native/debug/tcp_multi_client 9003` in another terminal. |
 | [Your First HTTP Request](https://ohyaan.github.io/network/10_first_http_request/) | [app/http-wire](app/http-wire) | Start `timeout 30s python3 -m http.server 8080 --bind 127.0.0.1 --protocol HTTP/1.1 --directory app/http-wire/www`; then run `./build/native/debug/http_wire_client 8080`. |
+| [HTTP Headers and Body Length](https://ohyaan.github.io/network/11_http_headers_and_body_length/) | [app/http-length](app/http-length) | Use the same Python fixture; run `./build/native/debug/http_length_client 8080`. |
 
 ## What runs
 
@@ -49,6 +50,7 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 - `tcp_multi_server` uses one thread, a nonblocking listener and nonblocking accepted sockets. `poll` watches at most four client slots. Each slot keeps a 256-byte echo buffer and a send offset; input is capped at 1024 bytes per connection. Write interest exists only while bytes remain unsent. Each connection expires three seconds after acceptance, regardless of progress. The server itself stops after 30000 ms by default; its optional second argument accepts 300–30000 ms. These are teaching limits, not production shutdown policies. A full slot table closes the next accepted connection.
 - `tcp_multi_client` opens two connections, keeps the first silent, and finishes an echo on the second before checking that the first remains open. It uses blocking calls with two-second Linux per-call timeouts and closes both descriptors. The earlier `tcp_echo_client` also works with the multi-client server.
 - `http_wire_client` sends a bodyless HTTP/1.1 GET with `Host` and `Connection: close`, without shutting down its write side. It captures the unchanged response through EOF, with an 8192-byte cap and a fixed receive deadline (default 3000 ms). Optional arguments select a visible ASCII path and a 1–10000 ms receive budget. It does not parse HTTP status or validate body framing; a complete reply held open deliberately reaches its deadline. The checked-in fixture directory contains only `hello.txt`.
+- `http_length_client` uses the same request and setup but parses a deliberately restricted HTTP/1.0 or HTTP/1.1 200/404 response profile: ASCII headers up to 4096 bytes and exactly one Content-Length of 0–4096 body bytes. It returns after that body, without peer EOF. Duplicate lengths, transfer/content encoding, malformed fields and other statuses are rejected rather than treated as generic HTTP. It closes after one response and does not parse surplus bytes as another response. A fixed receive deadline covers both headers and body.
 
 Each sample is a self-contained `.cpp` with system and standard headers only. Raw integer descriptors and the relevant socket calls are visible in each program. The cleanup section runs after either success or an error; there is no custom socket class. UDP examples use nonblocking sockets and `poll`. The first TCP pair uses blocking sockets with Linux per-call timeouts: 30 seconds for accepting, then three seconds for connected I/O. These are not overall request deadlines. Earlier samples report signal interruptions as errors; the lifecycle client's receive loop instead retries with the original deadline. CMake links the lifecycle fixture against platform thread support for its sleeping waits.
 
@@ -85,9 +87,11 @@ The additional 16 lifecycle checks cover EOF after queued data, reset, idle and 
 
 Another 16 multi-client checks cover the idle/active demonstration, four simultaneous streams with distinct binary payloads, incremental echo, slot reuse, capacity rejection, reset isolation, input limits, connection and server deadlines, invalid arguments, connection refusal and demo validation. The large echo requires several receive chunks but does not force a short `send()` result or exhaust kernel send buffers; no throughput or backpressure performance is claimed.
 
-Eleven HTTP wire checks add a real Python HTTP/1.1 fixture, a missing resource, exact GET/Host/CRLF bytes, replies split across peer writes, binary capture, size and deadline limits, an empty reply, invalid input and connection refusal. The complete suite has **84 CTest cases**.
+Eleven HTTP wire checks add a real Python HTTP/1.1 fixture, a missing resource, exact GET/Host/CRLF bytes, replies split across peer writes, binary capture, size and deadline limits, an empty reply, invalid input and connection refusal.
 
-See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these fourteen standalone C++ files exactly. In the website source checkout, check a samples clone with:
+Thirty-one HTTP length checks add completion while the peer stays open, zero-length and binary bodies, mixed-case names, whitespace, truncated headers and bodies, absent/duplicate/overflowing/oversized lengths, exact size limits, unsupported coding/status cases, malformed fields and ignored surplus bytes. The complete suite has **115 CTest cases**. This suite verifies the documented teaching profile, not full HTTP conformance.
+
+See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these fifteen standalone C++ files exactly. In the website source checkout, check a samples clone with:
 
 ```bash
 python -m scripts.check_network_examples /path/to/with-raspberry-pi-examples
