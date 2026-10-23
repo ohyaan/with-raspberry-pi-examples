@@ -1,5 +1,57 @@
 # Network verification
 
+## First HTTP/3 request and chapter completion
+
+Verified on 23 October 2026. **730/730 registered CTest cases passed in Debug
+and Release on both host and Raspberry Pi 4B**, without skipped cases. This
+adds 28 HTTP/3 cases to the preceding 702-case suite. The standalone HTTP/3
+client was also directly compiled on both machines and passed those 28 cases.
+An additional fixture-CLI smoke passed on each direct build. The original
+host's HTTP/3-disabled libcurl was tested separately: the same source rejects
+that runtime before UDP output rather than silently downgrading.
+
+Host/Pi use Debian security package libcurl4t64 and matching development files
+8.14.1-2+deb13u7, extracted only into scratch directories. Package SHA256 values
+were checked against the official package metadata. The host's original Ubuntu
+libcurl 8.18.0 remains untouched. Host HTTP/3 uses isolated Ubuntu libnghttp3 1.12.0;
+Pi retains its installed nghttp3 1.8.0. OpenSSL stays at 3.5.5 / 3.5.7 respectively.
+The isolated prefix is supplied per HTTP/3 test process, not globally. No sudo,
+system trust, firewall or service changes were made. The native OpenSSL QUIC
+backend is marked experimental in curl 8.14.1's documentation; this verification
+is a learning/interoperability record, not a production-backend recommendation.
+
+The independent aioquic HTTP/3 peer validates GET pseudo-fields, authority,
+request count and request end. Cases cover split/empty/binary/exact-limit bodies,
+declared/streaming oversized responses, a large header field, absent length,
+truncation, absent FIN, reset, early closure, wrong trust/hostname, missing or
+malformed CA files, absent/wrong ALPN, invalid arguments, proxy environment
+variables, 404/redirect handling and a fixed deadline despite trickling bytes.
+The TCP-only fixture observes no TCP accept. Certificate/identity failures
+produce no HTTP request. These cases do not claim exhaustive QPACK conformance
+or a bound on every internal library allocation.
+
+The client requires runtime HTTP/3, uses a fresh handle with 3ONLY, and checks
+the completed transfer's HTTP version and status. Certificate/host verification
+remain enabled; resolution is loopback-only, proxies/redirects are disabled,
+application body storage and delivered header bytes are capped separately.
+The C++ sample delegates HTTP/3/QPACK/QUIC integration to libcurl; it does not
+claim to hand-implement HTTP/3 or send HTTP/1.1 text on a QUIC stream.
+
+Manual CLI testing found that a completed HTTP response need not be followed
+by a fixture-observed connection-close notification. The bounded server now
+reports WAIT_EXPIRED and exits normally at its deadline, with an optional
+100–15000 ms wait parameter. A separate smoke starts the CLI, observes LISTEN,
+executes the direct C++ client, and verifies normal server exit on both systems.
+The registered 28 cases exercise the unchanged server start/protocol path;
+the CLI smoke is additional, not a skipped or fictitious registered case.
+
+All 36 standalone C++ files exactly match their articles. The new source passes
+clang-format 22.1.8; all 79 website unit tests passed with the isolated CURL
+include path supplied. The site builds and rendered course audit pass for
+30 Network pages. The HTTP/3 diagram renders as accessible SVG; expanded-source
+mobile layout is checked. Disabling both optional chapters still configures and
+builds the earlier UDP client. Website changes remain uncommitted local preview.
+
 ## Multiple QUIC streams
 
 Verified on 23 October 2026. **702/702 CTest cases passed in Debug and Release

@@ -1,6 +1,6 @@
 # Network
 
-C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections, HTTPS, a WebSocket opening-handshake probe and a reduced short-text/Close session, plus Ping/Pong interleaving, bounded extended payload lengths, message fragmentation, verified WSS and a first verified DTLS 1.2 pair. DTLS operation IDs, bounded retries and a session-local result cache are also available. The optional OpenSSL 3.5+ QUIC chapter includes a capability probe, a verified single-stream pair and a two-stream scheduling experiment. HTTP/3 follows separately.
+C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections, HTTPS, a WebSocket opening-handshake probe and a reduced short-text/Close session, plus Ping/Pong interleaving, bounded extended payload lengths, message fragmentation, verified WSS and a first verified DTLS 1.2 pair. DTLS operation IDs, bounded retries and a session-local result cache are also available. The optional OpenSSL 3.5+ QUIC chapter includes a capability probe, a verified single-stream pair and a two-stream scheduling experiment. A verified HTTP/3-only GET client using libcurl completes the first HTTP/3 path.
 
 ## Requirements and build
 
@@ -79,6 +79,7 @@ and supply NETWORK_QUIC_PYTHON. The C++ programs do not embed Python.
 | [QUIC Streams and Toolchain](https://ohyaan.github.io/network/26_quic_streams_and_toolchain/) | [app/quic-tools](app/quic-tools) | `./build/native/debug/quic_tools` after enabling `NETWORK_BUILD_QUIC` |
 | [Your First Verified QUIC Stream](https://ohyaan.github.io/network/27_first_verified_quic_stream/) | [app/quic-echo](app/quic-echo), [tests](tests/check_quic_echo.py) | See the QUIC pair below. |
 | [Multiple QUIC Streams](https://ohyaan.github.io/network/28_multiple_quic_streams/) | [app/quic-streams](app/quic-streams), [tests](tests/check_quic_streams.py) | See the two-stream experiment below. |
+| [Your First HTTP/3 Request](https://ohyaan.github.io/network/29_first_http3_request/) | [app/http3](app/http3), [fixture](fixtures/http3_server.py), [tests](tests/check_http3.py) | Enable `NETWORK_BUILD_HTTP3`; see the HTTP/3 request below. |
 
 ## TLS fixture
 
@@ -242,7 +243,65 @@ Run `ctest --preset native-debug -R '^network\.quic_streams\.' --output-on-failu
 Independent peers enforce the request-FIN/response ordering and exercise split,
 reverse-arrival, empty/binary/boundary, reset, missing-FIN and identity cases.
 
+## First HTTP/3 request
+
+This separate opt-in needs libcurl 7.88+ development files **and an HTTP/3-enabled
+runtime**. A modern curl version or an OpenSSL entry alone does not prove this.
+With the independent Python environment already configured:
+
+```bash
+cmake --preset native-debug -DNETWORK_BUILD_QUIC=ON -DNETWORK_BUILD_HTTP3=ON
+cmake --build --preset native-debug --target http3_client --parallel 2
+./build/native/debug/http3_client --features
+```
+
+Reuse the complete practice certificate-directory path in both terminals.
+Start the independent bounded server using the Python environment containing
+aioquic: `/path/to/venv/bin/python fixtures/http3_server.py 9450 "$http3_certs"`.
+After `LISTEN 9450`, run
+`./build/native/debug/http3_client 9450 "$http3_certs/ca.pem"` in the other
+terminal. Expect `http_version=3 status=200 body_bytes=13` followed by
+`hello HTTP/3`. The fixture stops after connection termination or its 15-second
+wait. `WAIT_EXPIRED` is a normal bounded-fixture exit; a response can complete
+without an observed peer close notification. `--session-ms` can shorten the
+fixture's wait (100–15000 ms). Restart it for each attempt; trust remains process-local.
+
+The C++ file uses libcurl to implement HTTP/3, not HTTP/1.1 text sent on a QUIC
+stream. A fresh handle requests HTTP/3-only and checks the completed protocol
+again. Server certificate/hostname checks remain enabled. Hostname resolution
+is forced to IPv4 loopback, proxies and redirects are disabled, only HTTPS is
+allowed, and a fixed timeout covers the entire transfer. A fixed 16384-byte
+body array, maximum-file-size policy and separate delivered-header byte budget
+bound application output, not all internal library allocations. Content
+decompression is disabled. Success requires the whole transfer and status 200.
+
+CLI: `port ca.pem [hostname [session_ms]]`, defaults localhost / 3000 ms, explicit
+budgets 1–10000 ms. An alternate simple DNS hostname still maps to loopback and
+is useful for identity failure tests. Feature-only mode sends no request.
+Run `ctest --preset native-debug -R '^network\.http3\.' --output-on-failure`.
+The fixture CLI can additionally be smoked with
+`/path/to/venv/bin/python tests/check_http3.py fixture_process build/native/debug`.
+
+Use maintained OS packages. curl 8.14.1's native OpenSSL QUIC backend was marked
+experimental; the dated verification record describes the isolated package
+setup used for learning tests, not a production recommendation. Never replace
+system libraries by hand to add this feature. With an intentionally isolated
+runtime, `NETWORK_HTTP3_RUNTIME_DIR` can prepend its directory to LD_LIBRARY_PATH
+for HTTP/3 CTest processes only. It is unnecessary for a normal installed setup.
+
+Website mirror syntax tests also need libcurl development headers. If those
+headers are intentionally isolated rather than installed, supply
+`NETWORK_CURL_INCLUDE_DIR` to the site's Python unittest command; this adds a
+compiler include path, not a skipped test or runtime replacement.
+
 ## What runs
+
+- `http3_client` makes one verified HTTP/3-only GET with libcurl and reports
+  status/protocol/body size only after a complete successful response. It
+  explicitly fails before transfer when the loaded library lacks HTTP/3.
+  Independent aioquic QUIC/HTTP/3 peers verify actual pseudo-fields and failures,
+  including no TCP fallback. QPACK and HTTP/3 stream management are library
+  responsibilities, not hidden course helpers.
 
 - `quic_streams_client` / `quic_streams_server` use the custom `wpi-streams/1`
   ALPN and two client bidirectional stream objects (0 and 4). The client holds
