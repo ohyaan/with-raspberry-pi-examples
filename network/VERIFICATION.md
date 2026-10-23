@@ -1,5 +1,58 @@
 # Network verification
 
+## First verified QUIC stream
+
+Verified on 23 October 2026. **663/663 CTest cases passed in Debug and Release
+on both the host and Raspberry Pi 4B**, with the QUIC option enabled and no
+skipped cases. This includes 31 new QUIC exchange cases. Host GCC 15.2 /
+OpenSSL 3.5.5 and Pi GCC 14.2 / OpenSSL 3.5.7 were used. The Pi reused its
+scratch-unpacked matching OpenSSL development headers and existing runtime
+libraries; no sudo, system trust, firewall or service changes were made.
+
+Independent protocol peers use aioquic 1.3.0 in dedicated temporary virtual
+environments (host Python 3.13.15, Pi Python 3.13.5). Host baseline tests retain
+their CMake-selected Python 3.12.14. Packages came from PyPI and, on Pi, its
+configured PiWheels mirror. The C++ programs do not depend on Python. CMake
+requires the test dependency explicitly rather than silently skipping it.
+
+Both native roles interoperate with the independent peer. Cases cover the
+native pair, split request/reply bytes, an empty/binary/exactly-64-byte request,
+65-byte rejection, wrong/short/oversized echoes, absent FIN, reset and early
+connection closure, wrong trust/hostname with no application bytes, missing or
+malformed CA files, absent/wrong ALPN, argument/key errors, occupied ports,
+first-peer/handshake waits and unchanged session deadlines. A controlled UDP
+relay drops the first outgoing handshake datagram; QUIC recovers without an
+application retry. The trickle-reply test supplies periodic data past the
+original client deadline and must still fail. These are scoped interoperability
+checks, not conformance, public-load or performance claims.
+
+Initial server testing found that empty accept queues must not be classified
+using the read/write retry helper. Checks now inspect ERR and wait for protocol
+events. A Pi empty-stream shutdown timeout also prompted servicing events after
+the readiness/timer wait, returning directly to application processing rather
+than waiting again after processing data. The final 31-case Pi subset passed
+with that source. Positive fixture budgets then gained normal-shutdown margin;
+negative fixed-deadline cases stayed short. The final complete Pi runs above
+use the final source and harness. The host final-source full suites passed,
+followed by all 31 cases in both configurations with the final harness.
+
+The pair uses separate listener/connection/stream objects and a private
+`wpi-echo/1` ALPN, not HTTP/3. Both descriptors bind loopback; the server handles
+one client stream and at most 64 application bytes. Each direction needs its
+own FIN. Trust, hostname and selected ALPN gate application data. Normal QUIC
+shutdown is serviced under the original deadline before freeing objects and
+closing descriptors. No general transaction, multi-client, 0-RTT, migration or
+unreliable-DATAGRAM behavior is claimed.
+
+Both sources were also compiled directly on both machines; all 31 cases passed
+against each direct-build pair. All 33 standalone course sources pass exact
+article matching and the new pair passes clang-format 22.1.8. The site's 79
+unit tests, build and rendered 28-page course audit pass. The Mermaid sequence
+has an accessible SVG title/description; with both full source listings open
+at mobile width, body and viewport remain 376 pixels, and only the diagram
+region scrolls (312-pixel container / 775-pixel content). Website changes remain
+uncommitted local preview.
+
 ## QUIC toolchain probe
 
 Verified on 23 October 2026. With `NETWORK_BUILD_QUIC=ON`, **632/632 CTest cases

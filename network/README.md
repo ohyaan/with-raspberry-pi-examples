@@ -1,6 +1,6 @@
 # Network
 
-C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections, HTTPS, a WebSocket opening-handshake probe and a reduced short-text/Close session, plus Ping/Pong interleaving, bounded extended payload lengths, message fragmentation, verified WSS and a first verified DTLS 1.2 pair. DTLS operation IDs, bounded retries and a session-local result cache are also available. The optional QUIC chapter starts with an OpenSSL capability probe; executable stream exchanges and HTTP/3 follow separately.
+C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections, HTTPS, a WebSocket opening-handshake probe and a reduced short-text/Close session, plus Ping/Pong interleaving, bounded extended payload lengths, message fragmentation, verified WSS and a first verified DTLS 1.2 pair. DTLS operation IDs, bounded retries and a session-local result cache are also available. The optional OpenSSL 3.5+ QUIC chapter includes a capability probe and a verified single-stream C++ pair; multiplexing and HTTP/3 follow separately.
 
 ## Requirements and build
 
@@ -27,7 +27,11 @@ including the server API. Enable it explicitly; earlier lessons keep their
 OpenSSL 3.0 minimum. No dependency is downloaded automatically.
 
 ```bash
-cmake --preset native-debug -DNETWORK_BUILD_QUIC=ON
+quic_tools_env=$(mktemp -d /tmp/network-quic-python.XXXXXX)
+python3 -m venv "$quic_tools_env/venv"
+"$quic_tools_env/venv/bin/python" -m pip install -r tests/requirements-quic.txt
+cmake --preset native-debug -DNETWORK_BUILD_QUIC=ON \
+    -DNETWORK_QUIC_PYTHON="$quic_tools_env/venv/bin/python"
 cmake --build --preset native-debug --parallel 2
 ./build/native/debug/quic_tools
 ctest --preset native-debug -R '^network\.quic_tools\.' --output-on-failure
@@ -37,6 +41,11 @@ ctest --preset native-debug -R '^network\.quic_tools\.' --output-on-failure
 runtime versions. It opens no socket and does not test HTTP/3. For Release,
 configure `native-release` with the same option. `openssl version` describes the
 CLI, not necessarily the development files or the runtime loaded by this probe.
+
+The independent optional tests require the pinned aioquic package. A C++-only
+build can use `-DBUILD_TESTING=OFF` instead; do not run CTest or claim those
+checks passed in that configuration. To re-enable tests, set BUILD_TESTING=ON
+and supply NETWORK_QUIC_PYTHON. The C++ programs do not embed Python.
 
 ### Available samples
 
@@ -68,6 +77,7 @@ CLI, not necessarily the development files or the runtime loaded by this probe.
 | [Your First Verified DTLS Exchange](https://ohyaan.github.io/network/24_first_verified_dtls_exchange/) | [app/dtls-echo](app/dtls-echo), [tests](tests/check_dtls.py) | See the DTLS pair below. |
 | [DTLS Message IDs and Explicit Retries](https://ohyaan.github.io/network/25_dtls_message_ids_and_retries/) | [app/dtls-ids](app/dtls-ids), [tests](tests/check_dtls_ids.py) | See the one-operation retry example below. |
 | [QUIC Streams and Toolchain](https://ohyaan.github.io/network/26_quic_streams_and_toolchain/) | [app/quic-tools](app/quic-tools) | `./build/native/debug/quic_tools` after enabling `NETWORK_BUILD_QUIC` |
+| [Your First Verified QUIC Stream](https://ohyaan.github.io/network/27_first_verified_quic_stream/) | [app/quic-echo](app/quic-echo), [tests](tests/check_quic_echo.py) | See the QUIC pair below. |
 
 ## TLS fixture
 
@@ -170,7 +180,49 @@ The request is ten bytes: version 1, kind 1, big-endian uint32 ID and amount. Th
 
 Exhausting retries reports outcome unknown, not proof that nothing executed: compare `drop_all_requests` with `drop_all_replies`. This bounded loopback retry schedule is not general Internet congestion control. The server still lacks public cookie/multi-client defenses and must remain on loopback. The ending alert can be lost even after the client confirms the result.
 
+## First verified QUIC pair
+
+Enable the optional chapter as above, then build `quic_echo_client` and
+`quic_echo_server`. Prepare terminal B before launching the one-session server.
+In terminal A:
+
+```bash
+quic_practice=$(mktemp -d /tmp/network-quic-practice.XXXXXX)
+python3 fixtures/tls_echo.py certs "$quic_practice/certs"
+printf '%s\n' "$quic_practice/certs"
+./build/native/debug/quic_echo_server 9448 \
+    "$quic_practice/certs/server.pem" "$quic_practice/certs/server.key"
+```
+
+In terminal B, set `quic_certs` to the complete printed certificate-directory
+path, then run `./build/native/debug/quic_echo_client 9448 "$quic_certs/ca.pem"`.
+Expect `verified=localhost alpn=wpi-echo/1` and
+`stream=0 echo_bytes=11 fin=received`. The server's final line reports
+`stream=0 echo_bytes=11 request_fin=received`. No HTTP is implemented.
+
+Server arguments: `port server.pem server.key [session_ms]` (default 10000 ms,
+port 0 selects/prints an ephemeral port). Client arguments:
+`port ca.pem [hostname [session_ms]]` (default localhost / 3000 ms). Both explicit
+budgets accept 1–10000 ms. Restart the server for each run. The practice CA is
+process-local, not globally installed; certificates last two days. This server
+does not authenticate clients or provide a public multi-session service.
+
+Run `ctest --preset native-debug -R '^network\.quic_echo\.' --output-on-failure`
+without a manual server. Independent aioquic peers check both roles, FIN,
+limits, reset/early closure, identity and ALPN failures. A loopback relay drops
+the first outgoing handshake datagram without changing system networking.
+The trickle-reply case verifies that incoming progress does not renew the fixed
+deadline. A passing recovery test is not a loss/performance benchmark.
+
 ## What runs
+
+- `quic_echo_client` / `quic_echo_server` are standalone OpenSSL 3.5+ QUIC
+  peers over explicit loopback UDP sockets. They use the custom `wpi-echo/1`
+  ALPN, not HTTP/3, and separate connection/stream objects. Client trust and
+  localhost identity are checked before sending eleven fixed request bytes.
+  The server echoes one FIN-delimited binary payload up to 64 bytes. Each
+  direction needs its own FIN. Both peers service protocol timers and connection
+  shutdown under unchanged session deadlines, then free their objects/fds.
 
 - `quic_tools` (optional OpenSSL 3.5+ chapter) checks compile-time/runtime
   versions, creates separate QUIC client and listener objects and sets their
