@@ -95,11 +95,15 @@ int main(int argc, char** argv) {
             for (;;) {
                 check_deadline();
                 const auto remaining =
-                    std::chrono::duration_cast<std::chrono::milliseconds>(
-                        deadline - std::chrono::steady_clock::now());
+                    std::chrono::ceil<std::chrono::milliseconds>(
+                        deadline - std::chrono::steady_clock::now())
+                        .count();
+                if (remaining <= 0) {
+                    throw std::runtime_error("session deadline expired");
+                }
                 pollfd ready{fd, events, 0};
                 const int result =
-                    ::poll(&ready, 1, static_cast<int>(remaining.count()) + 1);
+                    ::poll(&ready, 1, static_cast<int>(remaining));
                 if (result < 0 && errno == EINTR) {
                     continue;
                 }
