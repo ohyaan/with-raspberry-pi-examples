@@ -1,6 +1,6 @@
 # Network
 
-C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies and sequential connection reuse and verified TLS connections. HTTPS, WebSocket, DTLS and QUIC/HTTP/3 are planned.
+C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections and HTTPS. WebSocket, DTLS and QUIC/HTTP/3 are planned.
 
 ## Requirements and build
 
@@ -38,6 +38,7 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 | [HTTP Connection Reuse](https://ohyaan.github.io/network/14_http_connection_reuse/) | [app/http-reuse](app/http-reuse) | Use the Python HTTP/1.1 file fixture on port 8080; run `./build/native/debug/http_reuse_client 8080`. |
 | [Your First Verified TLS Connection](https://ohyaan.github.io/network/15_first_verified_tls_connection/) | [app/tls-echo](app/tls-echo) | See the TLS fixture commands below. |
 | [Certificates, Hostnames and Trust](https://ohyaan.github.io/network/16_certificates_hostnames_and_trust/) | [app/tls-echo](app/tls-echo), [tests](tests/check_tls_echo.py) | `ctest --preset native-debug -R network.tls_echo` |
+| [Your First HTTPS Request](https://ohyaan.github.io/network/17_first_https_request/) | [app/https](app/https), [fixture](fixtures/https_server.py) | See the HTTPS fixture commands below. |
 
 ## TLS fixture
 
@@ -52,7 +53,22 @@ timeout 35s python3 fixtures/tls_echo.py serve 9443 "$practice/certs"
 
 In terminal B, set `certs` to the printed absolute certificate-directory path and run `./build/native/debug/tls_echo_client 9443 "$certs/ca.pem"`. The fixture exits after one attempt; restart it before another. The practice CA is explicitly trusted only by that command. Do not install it into system trust or commit secret keys. Certificates expire after two days; generate fresh ones in a new directory as needed. This is not HTTPS or mutual TLS.
 
+## HTTPS fixture
+
+Use a fresh private practice directory and the same certificate generator in terminal A:
+
+```bash
+practice=$(mktemp -d /tmp/network-https-practice.XXXXXX)
+python3 fixtures/tls_echo.py certs "$practice/certs"
+printf '%s\n' "$practice/certs"
+timeout 35s python3 fixtures/https_server.py 9444 "$practice/certs"
+```
+
+In terminal B, set `certs` to the printed certificate-directory path, then run `./build/native/debug/https_client 9444 "$certs/ca.pem"`. Expect a verified TLS 1.3 / http/1.1 selection, status 200, 18 bytes and `Hello over HTTPS.`. Restart the fixture and add `/missing` to request its 404 response. The fixture accepts the sample's strict bodyless GET only; it is not a general web server. Do not install the practice CA globally or commit its secret keys.
+
 ## What runs
+
+- `https_client` carries one GET through verified TLS, requires an explicit http/1.1 ALPN selection, and parses a reduced HTTP/1.1 200/404 Content-Length response. Header and body caps are each 4096 bytes. Duplicate lengths, transfer/content coding, unsupported syntax and extra application data are rejected. HTTP completion is found before TLS closure; this sample additionally requires the peer's close_notify and its own successful shutdown before printing output. A complete HTTP body followed by an abrupt TLS close fails this deliberately strict shutdown policy, not necessarily HTTP framing. The single fixed session budget covers connect through shutdown, after local CA/TLS setup. No reconnect, redirect or insecure fallback is implemented.
 
 - `tls_echo_client` connects to IPv4 loopback with a nonblocking socket, requires TLS 1.3 and validates a certificate chain against the supplied CA file and a DNS identity (default localhost). SNI alone is not validation. It sends a fixed 16-byte message through OpenSSL, reads the exact echo and requires a two-way close_notify exchange. One fixed session budget (default 3000 ms, optional 1–10000) covers connect through shutdown, after local TLS/CA setup. `SSL_get_error` drives read/write polling. No crypto or certificate validation is implemented by the sample itself.
 
@@ -118,9 +134,9 @@ Twenty HTTP server cases add C++ client interoperability, GET/HEAD/404/405, raw 
 
 Thirty-three chunked cases add the fixture, split/coalesced input, empty/binary payloads, hexadecimal sizes including a maximum-length size line with split CRLF, truncated endings, malformed framing, conflicting headers, unsupported features, decoded/wire limits and deadlines.
 
-Fourteen reuse cases add a real persistent HTTP server, two sequential requests on one accepted socket, no prequeued second request, no extra accepted connection/retry, fragmented and empty responses, early closure, unsolicited bytes, invalid framing/status and per-response waits. Eighteen TLS cases add the real CLI fixture, a split echo, wrong CA/name, absent or malformed trust files, TLS-version policy, a plaintext peer, deadlines in handshake/read/shutdown, slow progress, abrupt/truncated/wrong echoes, invalid arguments and refusal. Rejected identities must receive no application request. The complete suite has **200 CTest cases**, covering the stated teaching profiles rather than general protocol conformance or a cryptographic audit.
+Fourteen reuse cases add a real persistent HTTP server, two sequential requests on one accepted socket, no prequeued second request, no extra accepted connection/retry, fragmented and empty responses, early closure, unsolicited bytes, invalid framing/status and per-response waits. Eighteen TLS cases add the real CLI fixture, a split echo, wrong CA/name, absent or malformed trust files, TLS-version policy, a plaintext peer, deadlines in handshake/read/shutdown, slow progress, abrupt/truncated/wrong echoes, invalid arguments and refusal. Rejected identities must receive no application request. Forty-one HTTPS cases add the actual 200/404 fixture, exact GET/Host/SNI/ALPN values, fragmented and combined responses, empty/binary payloads, exact size limits, malformed framing, early TLS shutdown, complete HTTP followed by abrupt TLS closure, surplus application bytes, identity/ALPN refusal before application data and fixed session deadlines. The complete suite has **241 CTest cases**, covering the stated teaching profiles rather than general protocol conformance or a cryptographic audit.
 
-See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these nineteen standalone C++ files exactly. In the website source checkout, check a samples clone with:
+See [VERIFICATION.md](VERIFICATION.md) for environments and results. Article source blocks match these twenty standalone C++ files exactly. In the website source checkout, check a samples clone with:
 
 ```bash
 python -m scripts.check_network_examples /path/to/with-raspberry-pi-examples

@@ -29,7 +29,7 @@ Servers bind only IPv4 loopback. Test servers use port zero and announce the sel
 
 The resolver formats `::1` but the actual communication examples use IPv4. This is not an IPv6 socket exchange test.
 
-The website's `python -m scripts.check_network_examples` confirms that all nineteen current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. TLS uses the maintained OpenSSL library, not custom cryptography. Interactive diagrams are educational models and are verified separately from these real socket checks.
+The website's `python -m scripts.check_network_examples` confirms that all twenty current standalone C++ files match the article blocks exactly. Every socket call and explicit descriptor cleanup is in the corresponding `.cpp`; no project-local header or wrapper class is needed. TLS uses the maintained OpenSSL library, not custom cryptography. Interactive diagrams are educational models and are verified separately from these real socket checks.
 
 ## First TCP lesson
 
@@ -144,3 +144,17 @@ The Pi had the runtime but no libssl-dev package, and noninteractive sudo was un
 Both host and Pi also compiled the standalone source directly. The host used the article's pkg-config command; the Pi used equivalent explicit scratch include paths and its runtime-library paths. Against these direct builds, the real fixture, wrong CA, wrong hostname and slow-progress deadline cases passed. Test peers terminated or were reaped by their harness; generated Pi binaries were cleaned afterward. No permanent service or public listener was installed.
 
 All nineteen C++ files pass clang-format 22.1.8 and exact article/source matching. The website's 79 unit tests and rendered course audit passed. Both new diagrams rendered as accessible Mermaid SVGs. At mobile width, only the diagrams scroll horizontally; opening the complete-code disclosure does not widen the body. Site publication remains separate from this examples update.
+
+## HTTP/1.1 over verified TLS
+
+Verified on 23 October 2026. **241/241 CTest cases passed in Debug and Release on both the development host and Raspberry Pi 4B**, without skipped cases. The compiler/CMake/Python environments and OpenSSL versions are unchanged from the preceding records. The Pi reused the officially packaged development headers unpacked in the earlier scratch directory and its existing runtime libraries; no administrative installation or system-trust change was made.
+
+The 41 new HTTPS cases cover the actual one-request fixture's 200/404 replies; exact request line, Host, SNI and ALPN; split and combined responses; empty and binary bodies; exact 4096-byte header/body limits; missing, duplicate, conflicting, negative, overflowing or oversized lengths; excessive headers; transfer/content coding; invalid header names/values and folding; unsupported status/version; truncated headers/body; an abrupt TCP close after a complete HTTP body; surplus application bytes; absent/nonoverlapping ALPN; wrong CA and wrong server identity; missing/malformed trust files; a TLS 1.2-only peer; plaintext on the TLS port; stalled handshake/read/closure; slow progress past the fixed session deadline; invalid input and connection refusal.
+
+The wrong-host certificate is signed by the trusted practice CA but has DNS:wrong.example in its SAN. Authentication or ALPN refusal must occur before any application bytes are received. The h2-only peer has no overlap with the client's http/1.1-only offer; this is not an HTTP/2 exchange. The Python peers provide independent application-level assertions while using their maintained TLS implementation, not independent cryptographic validation.
+
+HTTP completion is determined by Content-Length before TLS closure. The client then reads through the peer's close_notify, rejects extra application bytes, and completes its own TLS shutdown. It withholds successful stdout until all these steps succeed. A complete HTTP body followed by an abrupt TLS close fails this sample's deliberately strict shutdown policy; the record does not equate that case with a truncated HTTP body. No reconnect, redirect, insecure fallback or general HTTPS conformance is claimed.
+
+The host compiled the single source directly with the article's pkg-config command. The Pi directly compiled it using equivalent scratch include paths and its runtime-library paths. On both direct builds, the real 200/404 fixture, split response, exact body cap, wrong CA, wrong hostname, absent ALPN, abrupt closure and slow-progress deadline cases passed. Fixtures use IPv4 loopback only and harnesses join/reap their own peers. Generated Pi binaries were cleaned after testing; source, logs and isolated headers were retained. No public listener or permanent service was installed.
+
+All twenty sources pass clang-format 22.1.8 and exact article/source matching. The website's 79 unit tests and build passed; the rendered audit validates eighteen Network pages and 3875 internal links/assets. The HTTPS sequence rendered as an accessible Mermaid SVG. At mobile width the body remained within the viewport with the complete C++ listing open; the diagram alone scrolls horizontally. Website changes remain a preview, separate from the samples commit.
