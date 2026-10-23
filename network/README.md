@@ -1,6 +1,6 @@
 # Network
 
-C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections, HTTPS, a WebSocket opening-handshake probe and a reduced short-text/Close session, plus Ping/Pong interleaving, bounded extended payload lengths, message fragmentation, verified WSS and a first verified DTLS 1.2 pair. DTLS operation IDs, bounded retries and a session-local result cache are also available. QUIC/HTTP/3 is planned.
+C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections, HTTPS, a WebSocket opening-handshake probe and a reduced short-text/Close session, plus Ping/Pong interleaving, bounded extended payload lengths, message fragmentation, verified WSS and a first verified DTLS 1.2 pair. DTLS operation IDs, bounded retries and a session-local result cache are also available. The optional QUIC chapter starts with an OpenSSL capability probe; executable stream exchanges and HTTP/3 follow separately.
 
 ## Requirements and build
 
@@ -19,6 +19,26 @@ ctest --preset native-release --parallel 2
 Executables are in `build/native/debug/` or `build/native/release/`. Build one example with `cmake --build --preset native-debug --target udp_sequence`.
 
 ## Lesson mapping
+
+### Optional QUIC chapter
+
+The QUIC chapter needs OpenSSL **3.5+ development files with QUIC enabled**,
+including the server API. Enable it explicitly; earlier lessons keep their
+OpenSSL 3.0 minimum. No dependency is downloaded automatically.
+
+```bash
+cmake --preset native-debug -DNETWORK_BUILD_QUIC=ON
+cmake --build --preset native-debug --parallel 2
+./build/native/debug/quic_tools
+ctest --preset native-debug -R '^network\.quic_tools\.' --output-on-failure
+```
+
+`quic_tools` constructs client/listener objects and reports compile-time and
+runtime versions. It opens no socket and does not test HTTP/3. For Release,
+configure `native-release` with the same option. `openssl version` describes the
+CLI, not necessarily the development files or the runtime loaded by this probe.
+
+### Available samples
 
 | Lesson | Files | Run from network/ |
 |---|---|---|
@@ -47,6 +67,7 @@ Executables are in `build/native/debug/` or `build/native/release/`. Build one e
 | [WebSocket over Verified TLS](https://ohyaan.github.io/network/23_websocket_over_verified_tls/) | [app/wss](app/wss), [fixture](fixtures/wss.py) | See the WSS session below. |
 | [Your First Verified DTLS Exchange](https://ohyaan.github.io/network/24_first_verified_dtls_exchange/) | [app/dtls-echo](app/dtls-echo), [tests](tests/check_dtls.py) | See the DTLS pair below. |
 | [DTLS Message IDs and Explicit Retries](https://ohyaan.github.io/network/25_dtls_message_ids_and_retries/) | [app/dtls-ids](app/dtls-ids), [tests](tests/check_dtls_ids.py) | See the one-operation retry example below. |
+| [QUIC Streams and Toolchain](https://ohyaan.github.io/network/26_quic_streams_and_toolchain/) | [app/quic-tools](app/quic-tools) | `./build/native/debug/quic_tools` after enabling `NETWORK_BUILD_QUIC` |
 
 ## TLS fixture
 
@@ -150,6 +171,11 @@ The request is ten bytes: version 1, kind 1, big-endian uint32 ID and amount. Th
 Exhausting retries reports outcome unknown, not proof that nothing executed: compare `drop_all_requests` with `drop_all_replies`. This bounded loopback retry schedule is not general Internet congestion control. The server still lacks public cookie/multi-client defenses and must remain on loopback. The ending alert can be lost even after the client confirms the result.
 
 ## What runs
+
+- `quic_tools` (optional OpenSSL 3.5+ chapter) checks compile-time/runtime
+  versions, creates separate QUIC client and listener objects and sets their
+  nonblocking mode. It frees all partial allocations and opens no socket.
+  It does not establish a connection or demonstrate HTTP/3 support.
 
 - `dtls_ids_client` retains verified DTLS and a connected datagram BIO, then adds one fixed logical operation, at most three sends and a separate reply deadline. DTLS protocol timers, per-attempt reply windows and the unchanged whole-session deadline have different roles. Reply format/ID/result are checked; at most sixteen unrelated replies may be ignored. OpenSSL write retries keep their arguments unchanged, distinct from starting another application send. Failures after a possible send distinguish an unknown outcome from an already confirmed result.
 - `dtls_ids_server` accepts one loopback DTLS association and at most sixteen ten-byte requests, including duplicates. It validates the 1–100 amount, applies the first increment once and caches its complete request and fourteen-byte result. An identical retry receives that result without another increment. Changed content under the same ID or another ID fails this reduced profile. The one-slot cache is session/process-local, not transactional or durable.

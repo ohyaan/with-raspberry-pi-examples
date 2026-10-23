@@ -1,5 +1,28 @@
 # Network verification
 
+## QUIC toolchain probe
+
+Verified on 23 October 2026. With `NETWORK_BUILD_QUIC=ON`, **632/632 CTest cases
+passed in both Debug and Release on the host and Raspberry Pi 4B**, with no
+skipped cases. This adds three object-construction/argument cases, not a QUIC
+network exchange. Host headers/runtime report OpenSSL 3.5.5; Pi headers/runtime
+report 3.5.7. The Pi reused official matching headers unpacked in scratch space
+and its existing runtime libraries, without sudo or a system installation.
+
+The probe creates client/listener objects, checks their kinds, sets nonblocking
+mode, and frees all allocations without opening a socket. It explicitly states
+that HTTP/3 is not tested. Single-file direct builds passed the same three cases
+on both machines. A separate host configuration with QUIC off successfully built
+the earlier UDP client. Initial host regression runs inside the restricted
+sandbox could not create sockets; the complete runs above were repeated with
+loopback access and passed. This was not a protocol failure.
+
+All 31 standalone sources exactly match the articles. The site's 79 unit tests,
+build and rendered course audit passed (27 Network pages). The new flowchart
+renders as an SVG with accessible title/description. With its full source open
+at mobile width, body and viewport remain 376 pixels wide. The example uses
+clang-format 22.1.8. Website changes stay unpublished local preview.
+
 Verified on 22 October 2026. The scope is Linux user-space loopback communication and exact fixture results, not throughput, LAN connectivity or induced network impairment.
 
 | Environment | Compiler | CMake | Debug | Release |
