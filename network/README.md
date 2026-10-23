@@ -1,6 +1,6 @@
 # Network
 
-C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections, HTTPS, a WebSocket opening-handshake probe and a reduced short-text/Close session, plus Ping/Pong interleaving, bounded extended payload lengths, message fragmentation, verified WSS and a first verified DTLS 1.2 pair. DTLS operation IDs, bounded retries and a session-local result cache are also available. The optional OpenSSL 3.5+ QUIC chapter includes a capability probe and a verified single-stream C++ pair; multiplexing and HTTP/3 follow separately.
+C++20 samples for the [Network course](https://ohyaan.github.io/network/) on With Raspberry Pi. Available lessons cover development tools, addresses, UDP, TCP connections, framing, deadlines, multiple clients, HTTP clients/servers, chunked bodies, sequential connection reuse, verified TLS connections, HTTPS, a WebSocket opening-handshake probe and a reduced short-text/Close session, plus Ping/Pong interleaving, bounded extended payload lengths, message fragmentation, verified WSS and a first verified DTLS 1.2 pair. DTLS operation IDs, bounded retries and a session-local result cache are also available. The optional OpenSSL 3.5+ QUIC chapter includes a capability probe, a verified single-stream pair and a two-stream scheduling experiment. HTTP/3 follows separately.
 
 ## Requirements and build
 
@@ -78,6 +78,7 @@ and supply NETWORK_QUIC_PYTHON. The C++ programs do not embed Python.
 | [DTLS Message IDs and Explicit Retries](https://ohyaan.github.io/network/25_dtls_message_ids_and_retries/) | [app/dtls-ids](app/dtls-ids), [tests](tests/check_dtls_ids.py) | See the one-operation retry example below. |
 | [QUIC Streams and Toolchain](https://ohyaan.github.io/network/26_quic_streams_and_toolchain/) | [app/quic-tools](app/quic-tools) | `./build/native/debug/quic_tools` after enabling `NETWORK_BUILD_QUIC` |
 | [Your First Verified QUIC Stream](https://ohyaan.github.io/network/27_first_verified_quic_stream/) | [app/quic-echo](app/quic-echo), [tests](tests/check_quic_echo.py) | See the QUIC pair below. |
+| [Multiple QUIC Streams](https://ohyaan.github.io/network/28_multiple_quic_streams/) | [app/quic-streams](app/quic-streams), [tests](tests/check_quic_streams.py) | See the two-stream experiment below. |
 
 ## TLS fixture
 
@@ -214,7 +215,41 @@ the first outgoing handshake datagram without changing system networking.
 The trickle-reply case verifies that incoming progress does not renew the fixed
 deadline. A passing recovery test is not a loss/performance benchmark.
 
+## Multiple QUIC streams
+
+Reuse the optional QUIC configuration and the practice CA generation procedure.
+Build targets `quic_streams_client` and `quic_streams_server`. Start
+`./build/native/debug/quic_streams_server 9449 "$quic_certs/server.pem" "$quic_certs/server.key"`
+in one terminal; in another, run
+`./build/native/debug/quic_streams_client 9449 "$quic_certs/ca.pem"`.
+Here `quic_certs` must name the same complete, fresh certificate-directory path
+in each terminal, not an unshared shell variable.
+
+Expect `COMPLETE stream=4 slow_request_fin=not_sent` before `COMPLETE stream=0`,
+then `connection_shutdown=complete`. The server queues stream 4's reply before
+stream 0's. Payloads are `slow\n` and `fast\n`, five bytes each. No delay or loss
+is induced: "slow" means deliberately unfinished. Stream FIN, connection
+closure and durable application completion are different concepts.
+
+The server tracks streams 0 and 4 by ID, not arrival order, with two 65-byte
+buffers enforcing a 64-byte payload limit per stream. A WANT on one stream does
+not stop trying the other. Accepted extra/unidirectional streams or resets fail
+the profile. The client expects two immediately available stream slots and
+coordinates this one experiment, not arbitrary concurrent requests. Both CLI
+forms/deadlines match the single-stream pair. `wpi-streams/1` is not HTTP/3.
+
+Run `ctest --preset native-debug -R '^network\.quic_streams\.' --output-on-failure`.
+Independent peers enforce the request-FIN/response ordering and exercise split,
+reverse-arrival, empty/binary/boundary, reset, missing-FIN and identity cases.
+
 ## What runs
+
+- `quic_streams_client` / `quic_streams_server` use the custom `wpi-streams/1`
+  ALPN and two client bidirectional stream objects (0 and 4). The client holds
+  stream 0's request FIN until stream 4's response and FIN are received. The
+  server scans two separate bounded states without waiting inside one stream.
+  This is independent application progress, not a network latency benchmark.
+  Any invalid/reset stream aborts this deliberately reduced session.
 
 - `quic_echo_client` / `quic_echo_server` are standalone OpenSSL 3.5+ QUIC
   peers over explicit loopback UDP sockets. They use the custom `wpi-echo/1`

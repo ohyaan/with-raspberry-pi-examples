@@ -1,5 +1,45 @@
 # Network verification
 
+## Multiple QUIC streams
+
+Verified on 23 October 2026. **702/702 CTest cases passed in Debug and Release
+on host and Raspberry Pi 4B**, without skipped cases. The added 39 cases also
+passed against direct-compiled pairs on both machines. Compiler/OpenSSL and
+independent aioquic environments are unchanged from the preceding QUIC record.
+Pi builds reused the dedicated scratch tree's object files; no system packages,
+trust, firewall or services were modified. Standalone generated test binaries
+were removed after verification, retaining sources, objects and logs for reuse.
+
+The native pair completes stream 4 before stream 0. An independent aioquic
+server enforces the stronger protocol ordering: stream 0's request FIN must not
+arrive until that peer has sent stream 4's response. An independent client
+withholds stream 0's FIN, receives the C++ server's stream 4 response and FIN,
+then finishes stream 0. It also sends stream 4 before any stream 0 data to test
+ID-based state selection instead of assuming arrival order. No artificial
+network delay or speed comparison is claimed; "slow" means deliberately open.
+
+Other cases cover split request/reply data, empty/binary/exactly-64-byte
+requests, 65-byte input/reply rejection, absent FIN on either stream, per-stream
+reset, early connection closure, extra/unidirectional streams, wrong result
+bytes, CA/hostname/ALPN failure before application data, key/argument/bind errors
+and fixed deadlines. Missing stream 0 FIN does not prevent stream 4's observed
+completion but does prevent whole-session success. Resets/invalid streams abort
+this reduced application; it does not claim general cancellation recovery.
+
+The server scans two bounded StreamState records and never waits inside a
+single stream's WANT branch. Each buffer becomes immutable after request FIN,
+preserving write retry arguments while another stream progresses. One UDP
+socket and one verified connection are shared. The client is a deterministic
+experiment coordinator, not a general multiplexed dispatcher. Both directions'
+FIN and connection shutdown remain separate and use the original deadline.
+
+All 35 standalone sources exactly match the articles; the new pair passes
+clang-format 22.1.8. The site's 79 unit tests, build and 29-page rendered audit
+pass. Actual Mermaid rendering yields an accessible title/description. With
+both source disclosures open at mobile width, body/viewport remain 376 pixels;
+only the 312-pixel diagram container scrolls its 775-pixel content. Website
+changes remain unpublished local preview.
+
 ## First verified QUIC stream
 
 Verified on 23 October 2026. **663/663 CTest cases passed in Debug and Release
