@@ -6,15 +6,16 @@ Examples for the [C++ Hardware Programming course](https://ohyaan.github.io/prog
 
 | Lesson | Sample | Executable | Default behaviour |
 |---|---|---|---|
-| 1. Development Setup | [hello-world](app/hello-world/README.md) | `hello_world` | Print Hello, Raspberry Pi! |
-| 2. LED Output | [gpio-led](app/gpio-led/README.md) | `gpio_led` | Describe finite blinks without opening a GPIO chip |
-| 3. Button Input | [gpio-button](app/gpio-button/README.md) | `gpio_button` | Describe active-low input without opening a GPIO chip |
-| 4. Buzzer and Hardware PWM | [pwm](app/pwm/README.md) | `pwm_pulse` | Plan finite pulses without opening PWM files |
-| 5. Positional Servo | [positional-servo](app/positional-servo/README.md) | `servo_plan` | Calculate pulse units; actual output reuses `pwm_pulse` |
-| 6. Continuous Servo | [continuous-servo](app/continuous-servo/README.md) | `rotation_plan` | Calculate neutral/offset commands; output reuses `pwm_pulse` |
-| 7. SSD1306 OLED | [ssd1306](app/ssd1306/README.md) | `oled_hello` | Construct HELLO PI without opening I2C |
+| Part 1: Development Setup | [hello-world](app/hello-world/README.md) | `hello_world` | Print Hello, Raspberry Pi! |
+| Part 2: LED Output | [gpio-led](app/gpio-led/README.md) | `gpio_led` | Describe finite blinks without opening a GPIO chip |
+| Part 3: Button Input | [gpio-button](app/gpio-button/README.md) | `gpio_button` | Describe active-low input without opening a GPIO chip |
+| Part 4: Buzzer and Hardware PWM | [pwm](app/pwm/README.md) | `pwm_pulse` | Plan finite pulses without opening PWM files |
+| Part 5: Positional Servo | [positional-servo](app/positional-servo/README.md) | `servo_plan` | Calculate pulse units; actual output reuses `pwm_pulse` |
+| Part 6: Continuous Servo | [continuous-servo](app/continuous-servo/README.md) | `rotation_plan` | Calculate neutral/offset commands; output reuses `pwm_pulse` |
+| Part 7: SSD1306 OLED | [ssd1306](app/ssd1306/README.md) | `oled_hello` | Construct HELLO PI without opening I2C |
+| Part 8: SSD1306 Title Animation | [oled-title](app/oled-title/README.md) | `oled_title` | Render deterministic stars and title without opening I2C |
 
-All seven samples are built by default. Samples are named by topic, while this table and their READMEs retain the site's chapter order. The PWM implementation is shared by lessons 4–6 rather than copied into three drivers.
+All eight samples are built by default. Samples are named by topic, while this table and their READMEs retain the site's chapter order. The PWM implementation is shared by lessons 4–6 rather than copied into three drivers.
 
 ## Requirements
 
@@ -22,6 +23,7 @@ All seven samples are built by default. Samples are named by topic, while this t
 - CMake 3.28 or newer, Make and a C++17 compiler (GCC or Clang).
 - Linux development headers with GPIO character-device v2 (`linux/gpio.h`) and I2C (`linux/i2c-dev.h`) interfaces.
 - No display, GPIO wiring, root access or downloaded libraries for Hello World.
+- Python 3 for the software-only animation checks when BUILD_TESTING is enabled (the default).
 
 Check the installed tools before building:
 
@@ -51,7 +53,7 @@ Expected program output:
 Hello, Raspberry Pi!
 ```
 
-CTest runs 33 software-only checks: the complete greeting and exit status, dry runs, unit calculations, input boundaries and error messages. No CTest case enables GPIO, PWM or OLED output. The GPIO/PWM/OLED paths used in tests are placeholders, not device-selection advice.
+CTest runs 42 software-only checks: greeting/exit status, dry runs, calculations, input boundaries, deterministic animation previews and simulated I2C frame/shutdown failures. No case opens real GPIO, PWM or I2C hardware. The animation's output branches use a link-time fake bus, not a device. Test paths are placeholders, not device-selection advice.
 
 Safe first runs from this directory:
 
@@ -62,6 +64,7 @@ Safe first runs from this directory:
 ./build/native/debug/servo_plan 1500
 ./build/native/debug/rotation_plan 1500 0
 ./build/native/debug/oled_hello /dev/i2c-1 0x3c
+./build/native/debug/oled_title /unverified-device 0x3c
 ```
 
 These commands perform no device I/O. Do not append hardware-output flags without following the corresponding article's power, circuit, controller and permissions checks. GPIO/PWM use `--apply`; OLED uses `--show` or `--off`. Build and test never need sudo. Shut down and disconnect all relevant supplies before rewiring; GPIO is not a motor power source.
@@ -100,7 +103,8 @@ cpp-hardware-programming/
 │   ├── pwm/
 │   ├── positional-servo/
 │   ├── continuous-servo/
-│   └── ssd1306/
+│   ├── ssd1306/
+│   └── oled-title/
 ├── tests/
 │   ├── CMakeLists.txt
 │   └── check_program.cmake
@@ -125,9 +129,9 @@ Keep local overrides in an ignored `CMakeUserPresets.json`. Use a different buil
 
 Sources match the seven published article programs as recorded at site-source commit `6607df0f6ddf8a38bba54142fc8fd7902db44a32`. Source filenames are normalized to `main.cpp`; the implementations are unchanged. Hello World now matches the article's Raspberry Pi greeting instead of the initial scaffold's generic greeting.
 
-The OLED sample is the article's current standalone implementation. It does not yet use or modify the separate SSD1306 library. Library integration and the corresponding article rewrite remain separate work. The OLED source retains its original MIT license notice.
+The OLED samples are standalone implementations and do not use or modify the separate SSD1306 library. The original seven source mirrors remain unchanged. Part 8 adds a bounded title-effect recreation; it is not the recovered source of the earlier filmed demo. Initialization/transfer adaptations retain their MIT notice. See its README for deterministic preview, deliberate output and cleanup limitations.
 
-This change collects the samples without rewriting the website, changing its chapter structure or claiming new physical validation. Use the linked articles for full wiring, configuration and recovery procedures.
+The original collection did not claim new physical validation. The separately recorded Part 8 work adds an I2C transfer check on the existing Pi/display without claiming new filmed pixels, measured frame rate or power results. Use the linked articles for full wiring, configuration and recovery procedures.
 
 ## Verification
 

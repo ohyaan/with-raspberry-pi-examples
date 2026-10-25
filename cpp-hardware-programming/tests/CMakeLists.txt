@@ -1,5 +1,6 @@
 # All cases are calculations, dry runs or rejected arguments.
-# No test uses --apply, --show, --off, a real GPIO chip or a real PWM path.
+# These initial cases do not use --apply, --show, --off or real devices.
+# Later animation cases use a link-time fake bus for hardware-output branches.
 function(course_case name target expected_exit stream pattern)
     add_test(NAME ${name}
         COMMAND "${CMAKE_COMMAND}"
@@ -46,3 +47,18 @@ course_case(oled.usage oled_hello 1 stderr "Usage:")
 course_case(oled.bad_address oled_hello 1 stderr "permits only" "${unverified}" 0x78)
 course_case(oled.bad_format oled_hello 1 stderr "7-bit address" "${unverified}" 3c)
 course_case(oled.bad_flag oled_hello 1 stderr "Only --show" "${unverified}" 0x3c --wrong)
+
+# Link-time substitution logs transfers and simulates failures, never real I2C.
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+add_executable(oled_title_fixture ../app/oled-title/main.cpp oled_title_bus.cpp)
+set_target_properties(oled_title_fixture PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED YES CXX_EXTENSIONS NO)
+target_compile_options(oled_title_fixture PRIVATE -Wall -Wextra -Wpedantic -Werror)
+target_link_libraries(oled_title_fixture PRIVATE Threads::Threads)
+target_link_options(oled_title_fixture PRIVATE
+    -Wl,--wrap=open -Wl,--wrap=ioctl -Wl,--wrap=write -Wl,--wrap=close)
+foreach(case dry options previews missing_device bus_frames bus_failure bus_short_write bus_signal bus_address_failure)
+    add_test(NAME oled_title.${case}
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/check_oled_title.py"
+            "${case}" "$<TARGET_FILE:oled_title>" "$<TARGET_FILE:oled_title_fixture>")
+    set_tests_properties(oled_title.${case} PROPERTIES TIMEOUT 15)
+endforeach()

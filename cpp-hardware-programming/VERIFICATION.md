@@ -1,4 +1,35 @@
-# Seven-lesson sample verification
+# Hardware sample verification
+
+## Part 8: title recreation, 25 October 2026
+
+The existing seven samples remain unchanged. The eighth adds a standalone
+C++17 title animation with dry-run, PBM preview and finite explicit output.
+The source and full article block match `docs/programming/examples/oled-title/oled_title.cpp`
+in the website repository. The original video is historical footage, not a
+recording or performance measurement of this new implementation.
+
+Host: GCC 15.2.0, CMake 4.2.3, x86-64 Linux. Pi: Raspberry Pi 4B/AArch64,
+GCC 14.2.0, CMake 3.31.6, Python 3.13.5, Debian 13.7-based Raspberry Pi OS,
+kernel 6.18.50+rpt-rpi-v8. Debug and Release each pass 42/42 CTest checks on
+both machines, including nine animation checks. All input-negative cases,
+preview packing, golden frame/default checksum and the fake-bus I/O/shutdown
+checks run without real hardware. No external font or Python package is used.
+
+The fake bus links the same source with open/ioctl/write/close substitutes.
+It checks exact frame data against independently repacked PBM pixels, one
+Display On, per-frame addressing windows, final Display Off/close, SIGINT,
+write errors, short writes and address-selection failures. It is a software
+substitute, not a physical I2C or electrical test.
+
+On the existing, unused `/dev/i2c-1` (`bcm2835 (i2c@7e804000)`) and previously
+verified address 0x3c, the Pi sent 128/128 frames and Display Off, exiting zero.
+A separate Release run interrupted with SIGINT reported 10 frames then
+Display Off and status 130. No permanent process, package, service, boot or
+bus-speed setting was created/changed. This verifies successful writes and
+bounded process cleanup, not pixel readback, newly filmed appearance,
+achieved FPS, brightness, energy consumption, or burn-in prevention.
+
+## Original seven-lesson collection
 
 Date: 17 October 2026.
 
